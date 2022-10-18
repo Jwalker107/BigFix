@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='utf-8'?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Task>
+		<Title>Apache Commons Text detection scan (Windows) (INWORK)</Title>
+		<Description>&lt;H3&gt;This is Community Content. When you use these solutions, it is incumbent on your organization to test any solutions provided across the broadest available system base including various OS, storage solutions, and application inventory.&lt;/H3&gt;
+&lt;P&gt;&lt;/P&gt;
+&lt;P&gt;Please see the &lt;A href="https://forum.bigfix.com/t/log4j-vulnerability-identification-and-3rd-party-remediation-solution-testing-statement/40273"&gt;&lt;FONT color=#0066cc&gt;Community Solution Testing Statement&lt;/FONT&gt;&lt;/A&gt;&lt;/P&gt;
+&lt;P&gt;This Task performs a filesystem scan on Windows systems to attempt detecting Apache Commons Text versions vulnerable to CVE-2022-42889.&lt;/P&gt;
+&lt;UL&gt;
+&lt;LI&gt;&lt;A href="https://lists.apache.org/thread/n2bd4vdsgkqh2tm14l1wyc3jyol7s1om"&gt;https://lists.apache.org/thread/n2bd4vdsgkqh2tm14l1wyc3jyol7s1om&lt;/A&gt; 
+&lt;LI&gt;&lt;A href="https://nvd.nist.gov/vuln/detail/CVE-2022-42889"&gt;https://nvd.nist.gov/vuln/detail/CVE-2022-42889&lt;/A&gt;&lt;/LI&gt;&lt;/UL&gt;
+&lt;P&gt;&amp;nbsp;&lt;/P&gt;
+&lt;P&gt;This Task performs a filesystem search across all fixed disks on Windows platforms, to locate Apache Commons Text JAR files, either directly on the filesystem or embedded in a .WAR archive file.&amp;nbsp; In the case any .WAR file is found on the system, the 'unzip.exe' utility is used to perform a listing of files inside the archive to locate Apache Commons Text-related .JAR files.&amp;nbsp; Specifically, this Task searches for any versions of commons-text-1.10.0.jar.&lt;/P&gt;
+&lt;P&gt;Scan results are stored in a "Scans" subdirectory beneath the "BES Client" folder. 'apache-commons-text.log' contains the full script output for potential debugging or diagnosis, and 'apache-commons-text.txt' contains a listing of detected files in one of the forms&lt;/P&gt;
+&lt;UL style="MARGIN-RIGHT: 0px" dir=ltr&gt;
+&lt;LI&gt;C:\temp\commons-text\1.10.0\commons-text-1.10.0-tests.jar&lt;/LI&gt;
+&lt;LI&gt;C:\temp\commons-text.war||commons-text/1.4/commons-text-1.4.jar&lt;/LI&gt;&lt;/UL&gt;
+&lt;P dir=ltr&gt;The first sample entry indicates a detected jar file directly in the filesystem, while the second entry indicates a detected .jar file embedded within a .WAR archive.&lt;/P&gt;
+&lt;P&gt;This Task has several known limitations:&lt;/P&gt;
+&lt;UL&gt;
+&lt;LI&gt;Archives are not extracted recursively - only .JAR files contained directly within a .WAR archive are found; archives embedded within multiple layers of .WAR archives are not detected. 
+&lt;LI&gt;There is no option to throttle the scan in terms of processor or disk i/o usage.&amp;nbsp; Scans should be executed during non-critical hours, and staggered over time especially where multiple systems share a storage resource, such as a SAN or virtual machine storage pool.&lt;/LI&gt;&lt;/UL&gt;
+&lt;P&gt;This detection method uses Windows batch scripts with no external utility aside from 'unzip.exe'.&amp;nbsp; Results of the scan may be retrieved using the related Analysis.&lt;/P&gt;</Description>
+		<Relevance>windows of operating system AND (if exists property "in proxy agent context" then not in proxy agent context else true)</Relevance>
+		<Category />
+		<Source>Internal</Source>
+		<SourceID />
+		<SourceReleaseDate>2022-03-31</SourceReleaseDate>
+		<SourceSeverity />
+		<CVENames />
+		<SANSID />
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Tue, 18 Oct 2022 16:09:39 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<DefaultAction ID="Action1">
+			<Description>
+				<PreLink>Click </PreLink>
+				<Link>here</Link>
+				<PostLink> to deploy this action.</PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell">begin prefetch block
+add prefetch item name=unzip.exe sha1=84debf12767785cd9b43811022407de7413beb6f size=204800 url=http://software.bigfix.com/download/redist/unzip-6.0.exe sha256=2122557d350fd1c59fb0ef32125330bde673e9331eb9371b454c2ad2d82091ac
+end prefetch block
+// Add Unzip to Utility Cache:
+utility __Download\unzip.exe
+
+parameter "unzip"="{pathname of file "__Download\unzip.exe"}"
+parameter "ScansFolder" = "{(if (version of client &gt;= "9" as version) then (pathname of parent folder of data folder of client) else (pathname of parent folder of parent folder of client folder of site "actionsite"))}\Scans"
+folder create "{parameter "ScansFolder"}"
+
+parameter "output"="{pathname of folder (parameter "ScansFolder")}\apache-commons-text.txt"
+parameter "exec_output"="{pathname of folder (parameter "ScansFolder")}\apache-commons-text.log"
+delete "{parameter "output"}"
+delete "{parameter "exec_output"}"
+
+delete __createfile
+createfile until EOF_EOF_EOF_EOF
+set UNZIP="{parameter "unzip"}"
+setlocal EnableDelayedExpansion
+GOTO MAIN
+:PROCESSFILE
+echo Processfile %*
+REM If the file itself matches, output it and exit this function
+if %~x1==.jar echo %~dpnx1 &gt;&gt; "{parameter "output"}"&amp; exit /B 0
+REM the file is a war/jar, expand it to search for embedded files
+REM Use DelayedExpansion and !FILENAME! to prevent 'for' loop crashing on symbols like 'Program Files (x86)'
+set FILENAME=%~dpnx1
+for /F "tokens=*" %%i in ('"%UNZIP% -Z -1C "!FILENAME!" *commons-text-*.jar ^|findstr /R /V /C:"\-javadoc\.jar$" /C:"\-sources\.jar$" /C:"\-tests\.jar$""') do @echo !FILENAME!^|^|%%i &gt;&gt; "{parameter "output"}"
+exit /B 0
+
+:MAIN
+echo ::START::%DATE%::%TIME%&gt;&gt; "{parameter "output"}"
+
+{concatenation "%0d%0a" of ("for /F %22tokens=*%22 %25%25i in ('dir /s /b " &amp; it &amp; "\ ^| findstr /R /C:%22.*\.war$%22 /C:%22.*\.ear$%22 /C:%22commons\-text\-.*\.jar$%22 ^|findstr /R /V /C:%22\-javadoc\.jar$%22 /C:%22\-sources\.jar$%22 /C:%22\-tests\.jar$%22') do CALL :PROCESSFILE %22%25%25~dpnxi%22") of pathnames of root folders of drives whose (type of it = "DRIVE_FIXED")}
+
+endlocal
+echo ::FINISH::%DATE%::%TIME%&gt;&gt; "{parameter "output"}"
+
+EOF_EOF_EOF_EOF
+
+delete run_scan.cmd
+copy __createfile run_scan.cmd
+action uses wow64 redirection {not x64 of operating system}
+waithidden cmd.exe /c "run_scan.cmd &gt; "{parameter "output"}" &gt;"{parameter "exec_output"}" 2&gt;&amp;1"
+</ActionScript>
+		</DefaultAction>
+	</Task>
+</BES>

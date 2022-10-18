@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Analysis>
+		<Title>Apache Commons Text Scan Analysis</Title>
+		<Description>&lt;H3&gt;This is Community Content. When you use these solutions, it is incumbent on your organization to test any solutions provided across the broadest available system base including various OS, storage solutions, and application inventory.&lt;/H3&gt;
+&lt;P&gt;&lt;/P&gt;
+&lt;P&gt;Please see the &lt;A href="https://forum.bigfix.com/t/log4j-vulnerability-identification-and-3rd-party-remediation-solution-testing-statement/40273"&gt;&lt;FONT color=#0066cc&gt;Community Solution Testing Statement&lt;/FONT&gt;&lt;/A&gt;&lt;/P&gt;
+&lt;P&gt;This&amp;nbsp;Analysis retrieves results of&amp;nbsp;a filesystem scan to attempt detecting Apache Commons Text versions that may be vulnerable to one of the following vulnerabilty CVE-2022-42889 reported in October 2022:&lt;/P&gt;
+&lt;UL&gt;
+&lt;LI&gt;&lt;A href="https://lists.apache.org/thread/n2bd4vdsgkqh2tm14l1wyc3jyol7s1om"&gt;&lt;FONT color=#0066cc&gt;https://lists.apache.org/thread/n2bd4vdsgkqh2tm14l1wyc3jyol7s1om&lt;/FONT&gt;&lt;/A&gt; 
+&lt;LI&gt;&lt;A href="https://nvd.nist.gov/vuln/detail/CVE-2022-42889"&gt;&lt;FONT color=#0066cc&gt;https://nvd.nist.gov/vuln/detail/CVE-2022-42889&lt;/FONT&gt;&lt;/A&gt;&lt;BR&gt;&lt;/LI&gt;&lt;/UL&gt;
+&lt;P&gt;&lt;SPAN style="FONT-SIZE: 11pt"&gt;This Analysis attempts to detect the presence and versions of Apache Commons Text java library, without distinction between vulnerable or updated versions.&amp;nbsp; These results should be considered only a starting point in determining whether a system is actually vulnerable, along with other information such as the version of Java Virtual Machine and specific application or code configurations as referenced in the security bulletins above.&lt;/SPAN&gt;&lt;/P&gt;</Description>
+		<Relevance>if exists property "in proxy agent context" then not in proxy agent context else true</Relevance>
+		<Relevance>exists files "apache-commons-text.txt" of folders "Scans" of folders ((if (version of client &gt;= "9" as version) then (pathname of parent folder of data folder of client) else (pathname of parent folder of parent folder of client folder of site "actionsite")))</Relevance>
+		<Source>Internal</Source>
+		<SourceReleaseDate>2022-03-31</SourceReleaseDate>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Tue, 18 Oct 2022 16:15:23 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<Property Name="All Apache Commons Text Detections" ID="1" EvaluationPeriod="PT30M">(if exists property "locked lines" then locked lines of it else lines of it) whose (it does not start with "::") of files "apache-commons-text.txt" of folders "Scans" of folders ((if (version of client &gt;= "9" as version) then (pathname of parent folder of data folder of client) else (pathname of parent folder of parent folder of client folder of site "actionsite"))) </Property>
+		<Property Name="Number of Apache Commons Text Detections" ID="2" EvaluationPeriod="PT30M">number of (if exists property "locked lines" then locked lines of it else lines of it) whose (it does not start with "::") of files "apache-commons-text.txt" of folders "Scans" of folders ((if (version of client &gt;= "9" as version) then (pathname of parent folder of data folder of client) else (pathname of parent folder of parent folder of client folder of site "actionsite")))</Property>
+		<Property Name="Unique Apache Commons Text Versions Found" ID="4" EvaluationPeriod="PT30M">unique values of (unique value of following texts of lasts "-" of preceding texts of lasts ".jar" of (it as lowercase) | "unknown") of lines whose (it does not start with "::") of files "apache-commons-text.txt" of folders "Scans" of folders ((if (version of client &gt;= "9" as version) then (pathname of parent folder of data folder of client) else (pathname of parent folder of parent folder of client folder of site "actionsite")))</Property>
+	</Analysis>
+</BES>
