@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
 	<Task>
-		<Title>Apache Commons Text detection scan (Linux) (INWORK)</Title>
+		<Title>Apache Commons Text detection scan (Linux)</Title>
 		<Description>&lt;H3&gt;This is Community Content. When you use these solutions, it is incumbent on your organization to test any solutions provided across the broadest available system base including various OS, storage solutions, and application inventory.&lt;/H3&gt;
 &lt;P&gt;&lt;/P&gt;
 &lt;P&gt;Please see the &lt;A href="https://forum.bigfix.com/t/log4j-vulnerability-identification-and-3rd-party-remediation-solution-testing-statement/40273"&gt;&lt;FONT color=#0066cc&gt;Community Solution Testing Statement&lt;/FONT&gt;&lt;/A&gt;&lt;/P&gt;
@@ -13,7 +13,7 @@
 &lt;P&gt;This Task performs a filesystem search across all fixed disks on Linux platforms, to locate Apache Commons Text JAR files, either directly on the filesystem or embedded in a .WAR archive file.&amp;nbsp; In the case any .WAR file is found on the system, the 'unzip' utility is used to perform a listing of files inside the archive to locate Apache Commons Text-related JAR files.&amp;nbsp; Specifically, this Task searches for any versions of commons-text-X.X.X.jar.&lt;/P&gt;
 &lt;P&gt;Scan results are stored in a "Scans" subdirectory beneath the "BES Client" folder. 'apache-commons-text.log' contains the full script output for potential debugging or diagnosis, and 'apache-commons-text.txt' contains a listing of detected files in one of the forms&lt;/P&gt;
 &lt;UL&gt;
-&lt;LI&gt;/tmp/commons-text/1.4/commons-text-1.4.jar&lt;/LI&gt;
+&lt;LI&gt;/tmp/commons-text/1.4/commons-text-1.4.jar 
 &lt;LI&gt;/tmp/commons-text.war::commons-text/1.10.0/commons-text-1.10.0.jar&lt;BR&gt;&lt;/LI&gt;&lt;/UL&gt;
 &lt;P&gt;The first sample entry indicates a detected .jar file directly in the filesystem, while the second entry indicates a detected .jar file embedded within a .WAR archive.&lt;/P&gt;
 &lt;P&gt;This Task has several known limitations:&lt;/P&gt;
@@ -33,7 +33,7 @@
 		<SANSID />
 		<MIMEField>
 			<Name>x-fixlet-modification-time</Name>
-			<Value>Tue, 18 Oct 2022 16:08:36 +0000</Value>
+			<Value>Tue, 18 Oct 2022 16:37:11 +0000</Value>
 		</MIMEField>
 		<Domain>BESC</Domain>
 		<DefaultAction ID="Action1">
