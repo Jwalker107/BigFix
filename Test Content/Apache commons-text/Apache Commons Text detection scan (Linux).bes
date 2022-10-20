@@ -33,7 +33,7 @@
 		<SANSID />
 		<MIMEField>
 			<Name>x-fixlet-modification-time</Name>
-			<Value>Tue, 18 Oct 2022 16:37:11 +0000</Value>
+			<Value>Thu, 20 Oct 2022 15:36:31 +0000</Value>
 		</MIMEField>
 		<Domain>BESC</Domain>
 		<DefaultAction ID="Action1">
@@ -52,6 +52,9 @@ delete "{parameter "exec_output"}"
 delete __createfile
 createfile until EOF_EOF_EOF_EOF
 #!/bin/sh
+
+# Enable trace output from script
+set -o xtrace
 
 OUTPUT_FILE={parameter "output"}
 
@@ -86,7 +89,7 @@ EOF_EOF_EOF_EOF
 delete run_scan.sh
 copy __createfile run_scan.sh
 wait chmod +x run_scan.sh
-wait /bin/sh -c "./run_scan.sh &gt; '{parameter "exec_output"}' 2&gt;&amp;1"
+wait /bin/sh -x -c "./run_scan.sh &gt; '{parameter "exec_output"}' 2&gt;&amp;1"
 </ActionScript>
 		</DefaultAction>
 	</Task>
