@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Task>
+		<Title>OpenSSL 3.0.0 - 3.0.6 Detection - YARA Scan - Windows x32</Title>
+		<Description><![CDATA[<H1>YARA Scan for Windows - OpenSSL_3_lower_307</H1>
+<P>Two <STRONG>HIGH</STRONG>-severity vulnerabilities have been announced by the OpenSSL project on 2022-11-01, referenced at <A href="https://www.openssl.org/news/vulnerabilities.html">https://www.openssl.org/news/vulnerabilities.html</A>, affecting OpenSSL 3.0.0 through 3.0.6</P>
+<P>These include </P>
+<UL>
+<LI><A href="https://cve.org/CVERecord?id=CVE-2022-3786">https://cve.org/CVERecord?id=CVE-2022-3786</A> 
+<LI><A href="https://cve.org/CVERecord?id=CVE-2022-3602">https://cve.org/CVERecord?id=CVE-2022-3602</A></LI></UL>
+<P>This Task attempts to identify products that utilize the affected OpenSSL versions by scanning executables and executable library files on the system, probing for strings known to reside within programs built to use OpenSSL 3.</P>
+<P>This Task will</P>
+<UL>
+<LI>Download a copy of YARA 4.2.3 (<A href="https://github.com/VirusTotal/yara">https://github.com/VirusTotal/yara</A>) and store it under the BES Client\yara directory 
+<LI>Install Visual C++ Runtime 14.32.31332.0 if necessary (a prerequisite for YARA) 
+<LI>Perform a scan of all local drives or the specified directory to identify binaries with OpenSSL 3.0.0 - 3.0.6 
+<LI>Create an output report at BES Client\yara\results.&nbsp; The results can be parsed by the related Analysis to identify potentially-vulnerable programs.</LI></UL>
+<P><STRONG>Important Considerations:</STRONG></P>
+<UL>
+<LI>The YARA scan has limited throttling options.&nbsp; Take care when scanning.&nbsp; High disk utilization is expected and the scan may take considerable time to complete. 
+<LI>Avoid scanning shared resources such as VM infrastructure or shared SAN storage from multiple clients simultaneously, and stagger action-start-times to avoid overutilizing disk resources. 
+<LI>This task has no Default Action, as care should be taken when scheduling filesystem scans.</LI></UL><BR>
+<TABLE>
+<TBODY>
+<TR>
+<TD><LABEL for=signature_name>YARA signature name:</LABEL> </TD>
+<TD><INPUT disabled id=signature_name value=OpenSSL_3_lower_307 name=signature_name></INPUT></TD></TR>
+<TR>
+<TD><LABEL for=signature>YARA signature content:</LABEL> </TD>
+<TD><TEXTAREA disabled id=signature rows=20 cols=80 name=signature>import "pe"
+import "elf"
+
+rule OpenSSL_3_lower_307: executable_embedded_strings
+{
+    strings:
+        $re1 = /OpenSSL 3\.0\.[0-6]/
+    condition:
+        (pe.is_pe or elf.type == elf.ET_EXEC or elf.type == elf.ET_DYN) and any of them
+}
+</TEXTAREA></TD></TR>
+<TR>
+<TD><LABEL for=target>Scan target:</LABEL> </TD></TR>
+<TR>
+<TD><INPUT onchange=checktarget() id=localdrives CHECKED type=radio name=target> <LABEL for=localdrives>All Local Drives</LABEL><BR><INPUT onchange=checktarget() id=path type=radio name=target> <LABEL for=path>Specific Path:</LABEL> <INPUT disabled id=pathnames name=pathnames> <BR></TD></TR></TBODY></TABLE>
+<P><script>
+    function checktarget() {
+        var selected=gettargetid();
+        if (selected == "path") { 
+           document.getElementById('pathnames').disabled = false; 
+           document.getElementById('pathnames').focus();
+           }
+        else { document.getElementById('pathnames').disabled = true; }
+      
+    }
+
+    function gettargetid() {
+       var targets = document.getElementsByName('target');
+       for (i = 0; i < targets.length; i++) {
+         if (targets[i].checked) {
+            return (targets[i].id);
+         }
+       }
+    }
+
+    document.body.ontakeaction = function () {
+        TakeFixletAction(
+            Relevance('id of current fixlet'), Relevance('id of current bes site'), "Action1", {
+            "target": gettargetid(),
+            "pathnames": document.getElementById('pathnames').value
+        }, {}
+        );
+        return false;
+    }
+</script> </P>
+<P>&nbsp;</P>]]></Description>
+		<Relevance>windows of operating system and (if exists property "in proxy agent context" then not in proxy agent context else true)</Relevance>
+		<Relevance>x32 of operating system</Relevance>
+		<Category></Category>
+		<Source>Internal</Source>
+		<SourceID></SourceID>
+		<SourceReleaseDate>2022-03-15</SourceReleaseDate>
+		<SourceSeverity></SourceSeverity>
+		<CVENames></CVENames>
+		<SANSID></SANSID>
+		<MIMEField>
+			<Name>x-fixlet-yara-scan-identifier</Name>
+			<Value>OpenSSL_3_lower_307</Value>
+		</MIMEField>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Tue, 01 Nov 2022 17:27:18 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<Action ID="Action1">
+			<Description>
+				<PreLink>Click </PreLink>
+				<Link>here</Link>
+				<PostLink> to deploy this action.</PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell"><![CDATA[
+begin prefetch block
+// Collect yara binaries if not present
+
+
+if {(not exists files "yara32.exe" of it or not exists files "yarac32.exe" of it or not exists files "yara_version.txt" whose (key "YARA_VERSION" of it as string as version >= version "4.2.3") of it) of folders "yara" of parent folder of parent folder of client folder of site "actionsite"}
+ add prefetch item name=yara.zip size=1433696 sha1=3cd52552c08cca58e15ee77d558ff2979f628f08 url=https://github.com/VirusTotal/yara/releases/download/v4.2.3/yara-4.2.3-2029-win32.zip sha256=93c2b2b9b180cb351ae16dd34c67c128dc8db73df5e541dbcd8da9267a8dde3f
+ add prefetch item name=unzip.exe sha1=84debf12767785cd9b43811022407de7413beb6f size=204800 url=http://software.bigfix.com/download/redist/unzip-6.0.exe sha256=2122557d350fd1c59fb0ef32125330bde673e9331eb9371b454c2ad2d82091ac
+endif
+
+// Collect Visual C++ Runtime if missing or outdated
+
+if {not exists (it as string as version) whose(it >= "14.32.31332.0") of values "DisplayVersion" of keys whose(value "DisplayName" of it as string starts with "Microsoft Visual C++ 2015-" and value "DisplayName" of it as string ends with " Redistributable (x86)") of keys "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall" of (x32 registries; x64 registries)}
+ add prefetch item name=vc_redist.x86.exe sha1=29e23dd7c19b03eb59304f9d1f8e7209c1167348 size=13730768 url=https://download.visualstudio.microsoft.com/download/pr/7331f052-6c2d-4890-8041-8058fee5fb0f/CF92A10C62FFAB83B4A2168F5F9A05E5588023890B5C0CC7BA89ED71DA527B0F/VC_redist.x86.exe sha256=cf92a10c62ffab83b4a2168f5f9a05e5588023890b5c0cc7ba89ed71da527b0f
+endif
+
+end prefetch block
+
+// Install Visual C++ runtime if missing or outdated
+if {not exists (it as string as version) whose(it >= "14.32.31332.0") of values "DisplayVersion" of keys whose(value "DisplayName" of it as string starts with "Microsoft Visual C++ 2015-" and value "DisplayName" of it as string ends with " Redistributable (x86)") of keys "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall" of (x32 registries; x64 registries)}
+override wait
+hidden=true
+completion=job
+wait __Download\vc_redist.x86.exe /install /quiet /norestart
+endif
+
+
+// Extract yara if it is not already present
+if {(not exists files "yara32.exe" of it or not exists files "yarac32.exe" of it or not exists files "yara_version.txt" whose (key "YARA_VERSION" of it as string as version >= version "4.2.3") of it) of folders "yara" of parent folder of parent folder of client folder of site "actionsite"}
+  utility __Download/unzip.exe
+  folder create "{pathname of parent folder of parent folder of client folder of site "actionsite"}/yara"
+  parameter "yara_folder"="{pathnames of folders "yara" of parent folder of parent folder of client folder of site "actionsite"}"
+  waithidden __Download/unzip.exe -oq "__Download/yara.zip" -d "{parameter "yara_folder"}"
+  // yara64.exe does not contain version info blocks, so create a breadcrumb file for detection
+  delete __appendfile
+  appendfile YARA_VERSION=4.2.3
+  delete "{parameter "yara_folder"}\yara_version.txt"
+  copy __appendfile "{parameter "yara_folder"}\yara_version.txt"
+
+  // Exclude yara64.exe from Ms Antimalware On-Access scans to reduce system overhead while scanning
+  action uses wow64 redirection false
+  waithidden powershell.exe -ExecutionPolicy Bypass Add-MpPreference -ExclusionProcess '{parameter "yara_folder"}\yara32.exe'
+
+endif
+
+
+parameter "signature_name"="OpenSSL_3_lower_307"
+action parameter query "target" with description "Enter scan target type ('localdrives' or 'path')"
+action parameter query "pathnames" with description "Path to scan if target is 'path', else leave blank"
+
+
+parameter "yara"="{pathname of parent folder of parent folder of client folder of site "actionsite"}\yara\yara32.exe"
+parameter "yarac"="{pathname of parent folder of parent folder of client folder of site "actionsite"}\yara\yarac32.exe"
+parameter "signature_folder"="{pathname of parent folder of parent folder of client folder of site "actionsite"}\yara\signatures"
+parameter "output_folder"="{pathname of parent folder of parent folder of client folder of site "actionsite"}\yara\results"
+parameter "output"="{parameter "output_folder"}\{parameter "signature_name"}.out"
+parameter "err_output"="{parameter "output_folder"}\{parameter "signature_name"}.err"
+parameter "script_output"="{parameter "output_folder"}\{parameter "signature_name"}.script.out"
+parameter "timeout"="3600"
+// Strip special characters out of the signature name to ensure it is valid as a filename
+parameter "signature_shortname"="{concatenation "_" of parenthesized parts 2 of matches (regex("([^a-zA-Z0-9]|^)([a-zA-Z0-9]+)([^a-zA-Z0-9]|$)")) of parameter "signature_name" }"
+parameter "signature_file"="{parameter "signature_folder"}\{parameter "signature_shortname"}.yar"
+parameter "compiled_rules_file"="{parameter "signature_folder"}\{parameter "signature_shortname"}.yarc"
+//parameter "scan_info"="{pathname of parent folder of parent folder of client folder of site "actionsite"}\yara\results\results-{id of action as string}.json"
+parameter "scan_info"="{pathname of parent folder of parent folder of client folder of site "actionsite"}\yara\results\results-{parameter "signature_shortname"}.json"
+
+folder create "{parameter "signature_folder"}"
+folder create "{parameter "output_folder"}"
+
+action uses wow64 redirection {not x64 of operating system}
+
+// Create yara signature for the scan
+delete __createfile
+createfile until BIGFIX_END_OF_FILE_MARKER
+import "pe"
+import "elf"
+
+rule OpenSSL_3_lower_307: executable_embedded_strings
+{{
+    strings:
+        $re1 = /OpenSSL 3\.0\.[0-6]/
+    condition:
+        (pe.is_pe or elf.type == elf.ET_EXEC or elf.type == elf.ET_DYN) and any of them
+}
+
+BIGFIX_END_OF_FILE_MARKER
+
+delete "{parameter "signature_file"}"
+copy __createfile "{parameter "signature_file"}"
+
+
+// Compile yara signature for the scan
+delete "{parameter "compiled_rules_file"}"
+delete __createfile
+createfile until EOF_EOF_EOF_EOF
+REM Create compiled YARA rules file
+"{parameter "yarac"}"  {parameter "signature_shortname"}:"{parameter "signature_file"}" "{parameter "compiled_rules_file"}"
+EOF_EOF_EOF_EOF
+delete compile_yara_rules.cmd
+move __createfile compile_yara_rules.cmd
+waithidden cmd.exe /c compile_yara_rules.cmd
+
+// Abort action if we failed to compile yara rules
+continue if {exists file (parameter "compiled_rules_file")}
+
+
+// see https://yara.readthedocs.io/en/stable/commandline.html
+delete "{parameter "output"}"
+delete "{parameter "err_output"}"
+
+delete __createfile
+if {parameter "target" of action as lowercase = "path"}
+ // Abort If a specific scan path is requested but no pathname supplied
+ continue if {parameter "pathnames" of action as trimmed string != ""}
+ parameter "scanoption"="specific path"
+ createfile until EOF_EOF_EOF_EOF
+ECHO Scan specified path "{parameter "pathnames"}"
+"{parameter "yara"}" -C "{parameter "compiled_rules_file"}" -f -N -w -r --timeout={parameter "timeout"} --threads=1 {parameter "pathnames"} --print-strings >> "{parameter "output"}" 2>>"{parameter "err_output"}"
+EOF_EOF_EOF_EOF
+endif
+
+
+if {parameter "target" of action as lowercase = "localdrives"}
+ parameter "scanoption"="all local drives"
+ createfile until EOF_EOF_EOF_EOF
+ echo Scan all local drives
+{concatenation "%0d%0a" of ("%22" & parameter "yara" & "%22 -C %22" & parameter "compiled_rules_file" & "%22 -f -N -w -r --timeout=" & parameter "timeout" & " --threads=1 " & it as string & " --print-strings  >> %22" & parameter "output" & "%22 2>>%22" & parameter "err_output" & "%22") of root folders of drives whose (type of it = "DRIVE_FIXED")}
+EOF_EOF_EOF_EOF
+endif
+
+if {parameter "target" of action as lowercase = "processmemory"}
+ parameter "scanoption"="process memory"
+ createfile until EOF_EOF_EOF_EOF
+Echo Scan process memory
+TASKLIST
+{concatenation "%0d%0a" of ("%22" & parameter "yara" & "%22 -C %22" & parameter "compiled_rules_file"  & "%22 -f -N -w --timeout=" & parameter "timeout" & " --threads=1 " & it as string & " --print-strings >> %22" & parameter "output" & "%22 2>>%22" & parameter "err_output" & "%22") of unique values of process ids of processes}
+EOF_EOF_EOF_EOF
+endif
+
+delete yara_scan.cmd
+copy __createfile yara_scan.cmd
+
+// Delete extraneous files which could contain copies of the signatures and false-positives
+delete __createfile
+delete __appendfile
+// Execute the scan
+parameter "scan-start-time"="{now}"
+waithidden cmd.exe /c "yara_scan.cmd > "{parameter "script_output"}" 2>&1" 
+
+// Save scan settings and results file in JSON format for analysis
+delete __createfile
+createfile until EOF_EOF_EOF_EOF
+{{
+ "signature_shortname": "{parameter "signature_shortname"}",
+ "scan_start_time": "{parameter "scan-start-time"}",
+ "scan_completion_time": "{now}",
+ "scan_duration_seconds": {(now - (parameter "scan-start-time" as time)) / second },
+ "scan_target": "{parameter "target"}",
+ "scan_paths": "{concatenation "\\" of substrings separated by "\" of parameter "pathnames"}",
+ "result_code": {exit code of action},
+ "results": [
+  {  if (parameter "target" = "localdrives" or parameter "target"="path") then concatenation ",%0a" of ( "{%22Detection%22: %22" & item 0 of it &  "%22, %22file%22: %22" & concatenation "\\" of substrings separated by "\" of item 1 of it & "%22, %22matched_strings%22: %22" & concatenation "\\" of substrings separated by "\" of (item 2 of it as string) & "%22}}") of (preceding text of first " " of item 0 of it, following text of first " " of item 0 of it, (if exists tuple items of item 1 of it then tuple items of item 1 of it as string else "")) of (tuple items whose (index of it = 0) of it as string, tuple string of (/* split of the indexes from the matched strings */(following texts of firsts ": " of (it as string)) of tuple items whose (index of it > 0) of it as string)) of ( tuple string of items 0 of (lines of item 0 of it, item 1 of it, item 2 of it) whose (line number of item 0 of it >= item 1 of it and line number of item 0 of it <= item 2 of it) of it) of (item 0 of it, item 1 of it, (minimum of items 1 of (item 1 of it, elements of item 2 of it) whose (item 0 of it < item 1 of it) - 1)| number of lines of item 0 of it) of (item 0 of it, elements of item 1 of it, item 1 of it) of (it, set of line numbers of lines whose (preceding text of first " " of it does not contain ":") of it) of files ( parameter "output" ) else ""}
+ ]
+}
+EOF_EOF_EOF_EOF
+delete "{parameter "scan_info"}"
+copy __createfile "{parameter "scan_info"}"
+                                                ]]></ActionScript>
+		</Action>
+	</Task>
+</BES>
