@@ -75,10 +75,10 @@ rule OpenSSL_3_lower_307: executable_embedded_strings
 <P>&nbsp;</P>]]></Description>
 		<Relevance>windows of operating system and (if exists property "in proxy agent context" then not in proxy agent context else true)</Relevance>
 		<Relevance>x32 of operating system</Relevance>
-		<Category></Category>
-		<Source>Internal</Source>
+		<Category>Vulnerability Scan</Category>
+		<Source>HCL BigFix Services</Source>
 		<SourceID></SourceID>
-		<SourceReleaseDate>2022-03-15</SourceReleaseDate>
+		<SourceReleaseDate>2022-11-01</SourceReleaseDate>
 		<SourceSeverity></SourceSeverity>
 		<CVENames></CVENames>
 		<SANSID></SANSID>
@@ -88,7 +88,7 @@ rule OpenSSL_3_lower_307: executable_embedded_strings
 		</MIMEField>
 		<MIMEField>
 			<Name>x-fixlet-modification-time</Name>
-			<Value>Tue, 01 Nov 2022 17:27:18 +0000</Value>
+			<Value>Tue, 01 Nov 2022 18:15:37 +0000</Value>
 		</MIMEField>
 		<Domain>BESC</Domain>
 		<Action ID="Action1">

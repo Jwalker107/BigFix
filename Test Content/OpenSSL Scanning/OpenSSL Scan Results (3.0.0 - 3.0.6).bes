@@ -5,12 +5,12 @@
 		<Description><![CDATA[<P>Two <STRONG>HIGH</STRONG>-severity vulnerabilities have been announced by the OpenSSL project on 2022-11-01, referenced at <A href="https://www.openssl.org/news/vulnerabilities.html"><FONT color=#0066cc>https://www.openssl.org/news/vulnerabilities.html</FONT></A>, affecting OpenSSL 3.0.0 through 3.0.6</P>
 <P>These include </P>
 <UL>
-<LI><A href="https://cve.org/CVERecord?id=CVE-2022-3786"><FONT color=#0066cc>https://cve.org/CVERecord?id=CVE-2022-3786</FONT></A></LI>
+<LI><A href="https://cve.org/CVERecord?id=CVE-2022-3786"><FONT color=#0066cc>https://cve.org/CVERecord?id=CVE-2022-3786</FONT></A> 
 <LI><A href="https://cve.org/CVERecord?id=CVE-2022-3602"><FONT color=#0066cc>https://cve.org/CVERecord?id=CVE-2022-3602</FONT></A></LI></UL>
 <P>This&nbsp;Analysis attempts to identify products that utilize the affected OpenSSL versions by scanning executables and executable library files on the system, probing for strings known to reside within programs built to use OpenSSL 3.&nbsp; This Analysis parses results from previously-executed OpenSSL 3 scans and reports back properties to reflect the OpenSSL 3.0.0 - 3.0.6 versions found, the files containing those versions, and the date on which the scan was executed.</P>
 <P><STRONG>Important Considerations:</STRONG></P>
 <UL>
-<LI>The YARA scan has limited throttling options.&nbsp; Take care when scanning.&nbsp; High disk utilization is expected and the scan may take considerable time to complete.</LI>
+<LI>The YARA scan has limited throttling options.&nbsp; Take care when scanning.&nbsp; High disk utilization is expected and the scan may take considerable time to complete. 
 <LI>Avoid scanning shared resources such as VM infrastructure or shared SAN storage from multiple clients simultaneously, and stagger action-start-times to avoid overutilizing disk resources.</LI></UL>]]></Description>
 		<Relevance>(if exists property "in proxy agent context" then not in proxy agent context else true)</Relevance>
 		<Relevance>exists files "results-OpenSSL_3_lower_307.json" of folders "results" of folders "yara" of parent folder of parent folder of client folder of site "actionsite"</Relevance>
@@ -18,7 +18,7 @@
 		<SourceReleaseDate>2022-10-31</SourceReleaseDate>
 		<MIMEField>
 			<Name>x-fixlet-modification-time</Name>
-			<Value>Tue, 01 Nov 2022 17:26:06 +0000</Value>
+			<Value>Tue, 01 Nov 2022 18:15:55 +0000</Value>
 		</MIMEField>
 		<Domain>BESC</Domain>
 		<Property Name="OpenSSL File Detections (3.0.0 - 3.0.6)" ID="1" EvaluationPeriod="PT6H">(values of keys "matched_strings" of it, values of keys "file" of it) of elements of values of keys "results" of jsons of files "results-OpenSSL_3_lower_307.json" of folders "results" of folders "yara" of parent folder of parent folder of client folder of site "actionsite"</Property>
