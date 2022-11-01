@@ -87,8 +87,12 @@ rule OpenSSL_3_lower_307: executable_embedded_strings
 			<Value>OpenSSL_3_lower_307</Value>
 		</MIMEField>
 		<MIMEField>
+			<Name>x-fixlet-first-propagation</Name>
+			<Value>Tue, 01 Nov 2022 18:15:55 +0000</Value>
+		</MIMEField>
+		<MIMEField>
 			<Name>x-fixlet-modification-time</Name>
-			<Value>Tue, 01 Nov 2022 18:15:37 +0000</Value>
+			<Value>Tue, 01 Nov 2022 22:51:54 +0000</Value>
 		</MIMEField>
 		<Domain>BESC</Domain>
 		<Action ID="Action1">
@@ -102,7 +106,7 @@ begin prefetch block
 // Collect yara binaries if not present
 
 
-if {(not exists files "yara32.exe" of it or not exists files "yarac32.exe" of it or not exists files "yara_version.txt" whose (key "YARA_VERSION" of it as string as version >= version "4.2.3") of it) of folders "yara" of parent folder of parent folder of client folder of site "actionsite"}
+if {not exists folders "yara" whose (exists files "yara32.exe" of it and exists files "yarac32.exe" of it and exists files "yara_version.txt" whose (key "YARA_VERSION" of it as string as version >= version "4.2.3") of it) of parent folder of parent folder of client folder of site "actionsite"}
  add prefetch item name=yara.zip size=1433696 sha1=3cd52552c08cca58e15ee77d558ff2979f628f08 url=https://github.com/VirusTotal/yara/releases/download/v4.2.3/yara-4.2.3-2029-win32.zip sha256=93c2b2b9b180cb351ae16dd34c67c128dc8db73df5e541dbcd8da9267a8dde3f
  add prefetch item name=unzip.exe sha1=84debf12767785cd9b43811022407de7413beb6f size=204800 url=http://software.bigfix.com/download/redist/unzip-6.0.exe sha256=2122557d350fd1c59fb0ef32125330bde673e9331eb9371b454c2ad2d82091ac
 endif
@@ -125,7 +129,7 @@ endif
 
 
 // Extract yara if it is not already present
-if {(not exists files "yara32.exe" of it or not exists files "yarac32.exe" of it or not exists files "yara_version.txt" whose (key "YARA_VERSION" of it as string as version >= version "4.2.3") of it) of folders "yara" of parent folder of parent folder of client folder of site "actionsite"}
+if {not exists folders "yara" whose (exists files "yara32.exe" of it and exists files "yarac32.exe" of it and exists files "yara_version.txt" whose (key "YARA_VERSION" of it as string as version >= version "4.2.3") of it) of parent folder of parent folder of client folder of site "actionsite"}
   utility __Download/unzip.exe
   folder create "{pathname of parent folder of parent folder of client folder of site "actionsite"}/yara"
   parameter "yara_folder"="{pathnames of folders "yara" of parent folder of parent folder of client folder of site "actionsite"}"
@@ -155,7 +159,7 @@ parameter "output_folder"="{pathname of parent folder of parent folder of client
 parameter "output"="{parameter "output_folder"}\{parameter "signature_name"}.out"
 parameter "err_output"="{parameter "output_folder"}\{parameter "signature_name"}.err"
 parameter "script_output"="{parameter "output_folder"}\{parameter "signature_name"}.script.out"
-parameter "timeout"="3600"
+parameter "timeout"="21600"
 // Strip special characters out of the signature name to ensure it is valid as a filename
 parameter "signature_shortname"="{concatenation "_" of parenthesized parts 2 of matches (regex("([^a-zA-Z0-9]|^)([a-zA-Z0-9]+)([^a-zA-Z0-9]|$)")) of parameter "signature_name" }"
 parameter "signature_file"="{parameter "signature_folder"}\{parameter "signature_shortname"}.yar"
