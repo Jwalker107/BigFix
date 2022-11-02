@@ -17,12 +17,17 @@
 		<Source>Internal</Source>
 		<SourceReleaseDate>2022-10-31</SourceReleaseDate>
 		<MIMEField>
-			<Name>x-fixlet-modification-time</Name>
+			<Name>x-fixlet-first-propagation</Name>
 			<Value>Tue, 01 Nov 2022 18:15:55 +0000</Value>
+		</MIMEField>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Wed, 02 Nov 2022 14:26:28 +0000</Value>
 		</MIMEField>
 		<Domain>BESC</Domain>
 		<Property Name="OpenSSL File Detections (3.0.0 - 3.0.6)" ID="1" EvaluationPeriod="PT6H">(values of keys "matched_strings" of it, values of keys "file" of it) of elements of values of keys "results" of jsons of files "results-OpenSSL_3_lower_307.json" of folders "results" of folders "yara" of parent folder of parent folder of client folder of site "actionsite"</Property>
 		<Property Name="OpenSSL Versions Found (3.0.0 - 3.0.6)" ID="2" EvaluationPeriod="PT6H">unique values of (it as string) of (values of keys "matched_strings" of it) of elements of values of keys "results" of jsons of files "results-OpenSSL_3_lower_307.json" of folders "results" of folders "yara" of parent folder of parent folder of client folder of site "actionsite"</Property>
-		<Property Name="Scan Time" ID="3" EvaluationPeriod="PT6H"><![CDATA[((year of it as string & month of it as two digits & day_of_month of it as two digits & "_") of date (universal time zone) of it & (two digit hour of it & two digit minute of it & two digit second of it) of  time (universal time zone) of it & "Z") of (it as string as time) of values of keys "scan_start_time" of jsons of files "results-OpenSSL_3_lower_307.json" of folders "results" of folders "yara" of parent folder of parent folder of client folder of site "actionsite"]]></Property>
+		<Property Name="OpenSSL Scan Time" ID="3" EvaluationPeriod="PT6H"><![CDATA[((year of it as string & month of it as two digits & day_of_month of it as two digits & "_") of date (universal time zone) of it & (two digit hour of it & two digit minute of it & two digit second of it) of  time (universal time zone) of it & "Z") of (it as string as time) of values of keys "scan_start_time" of jsons of files "results-OpenSSL_3_lower_307.json" of folders "results" of folders "yara" of parent folder of parent folder of client folder of site "actionsite"]]></Property>
+		<Property Name="OpenSSL Scan Duration" ID="4" EvaluationPeriod="PT6H">(it as integer * second) of values of keys "scan_duration_seconds" of jsons of files "results-OpenSSL_3_lower_307.json" of folders "results" of folders "yara" of parent folder of parent folder of client folder of site "actionsite"</Property>
 	</Analysis>
 </BES>

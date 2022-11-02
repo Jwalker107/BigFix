@@ -90,7 +90,7 @@ rule OpenSSL_3_lower_307: executable_embedded_strings
 		</MIMEField>
 		<MIMEField>
 			<Name>x-fixlet-modification-time</Name>
-			<Value>Tue, 01 Nov 2022 22:51:36 +0000</Value>
+			<Value>Wed, 02 Nov 2022 14:23:42 +0000</Value>
 		</MIMEField>
 		<Domain>BESC</Domain>
 		<Action ID="Action1">
@@ -103,8 +103,8 @@ rule OpenSSL_3_lower_307: executable_embedded_strings
 begin prefetch block
 // Collect yara binaries if not present
 if {not exists folders "yara" whose (exists files "yara64.exe" of it and exists files "yarac64.exe" of it and exists files "yara_version.txt" whose (key "YARA_VERSION" of it as string as version >= version "4.2.3") of it) of parent folder of parent folder of client folder of site "actionsite"}
- add prefetch item name=yara.zip size=2091495 sha1=9d457f44fe83955472d483268df8bdc89a7fdef6 url=https://github.com/VirusTotal/yara/releases/download/v4.2.3/yara-4.2.3-2029-win64.zip sha256=56d379b99bbf9b9894ff80c948876d5206ba79342774186eb0ef6ed63fd79ba6
- add prefetch item name=unzip.exe sha1=84debf12767785cd9b43811022407de7413beb6f size=204800 url=http://software.bigfix.com/download/redist/unzip-6.0.exe sha256=a71a7070bc6dd392e0c066a590d2262382b0c3d73e76cc0851dc33ab5d51d381
+ add prefetch item name=yara.zip size=2091495 sha1=9d457f44fe83955472d483268df8bdc89a7fdef6 url=https://github.com/VirusTotal/yara/releases/download/v4.2.3/yara-4.2.3-2029-win64.zip sha256=a71a7070bc6dd392e0c066a590d2262382b0c3d73e76cc0851dc33ab5d51d381
+ add prefetch item name=unzip.exe sha1=84debf12767785cd9b43811022407de7413beb6f size=204800 url=http://software.bigfix.com/download/redist/unzip-6.0.exe sha256=2122557d350fd1c59fb0ef32125330bde673e9331eb9371b454c2ad2d82091ac
 endif
 
 // Collect Visual C++ Runtime if missing our outdated
