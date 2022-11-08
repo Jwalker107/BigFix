@@ -49,9 +49,9 @@ def main():
 </SourcedFixletAction>
 </BES>
 """
-    #    args = parser.parse_args()
+    args = parser.parse_args()
     # parse sample arguments
-    args = parser.parse_args(["oracle_config.json"])
+    # args = parser.parse_args(["oracle_config.json"])
     config_file = args.config_file
     print(f"Loading {os.path.realpath(config_file)}")
     if os.path.exists(config_file):
