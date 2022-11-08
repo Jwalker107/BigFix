@@ -1,0 +1,17 @@
+{
+	"root_url": "https://bes-root.domain.home:52311",
+	"source_fixlet_site": "CIS Checklist for Oracle Database 11_11g R2 on Linux",
+	"source_fixlet_id": 11,
+	"source_action_name": "Action1",
+	
+	"targets": [{
+        "computer_names": ["BES-ROOT"],
+        "computer_ids": [1582295],
+        "instances": [{
+                "instance_name": "instance1",
+                "instance_home": "/u01/app/oracle/product/11.2.0.4/db_1"
+				}
+				]
+    }
+]
+}
