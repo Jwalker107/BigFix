@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Task>
+		<Title>Sample User Interface, Run As User, with PowerShell WinForm</Title>
+		<Description>An example of execution with a visible PowerShell UI </Description>
+		<Relevance>windows of operating system AND (if exists property "in proxy agent context" then not in proxy agent context else true)</Relevance>
+		<Category></Category>
+		<Source>Internal</Source>
+		<SourceID></SourceID>
+		<SourceReleaseDate>2022-02-14</SourceReleaseDate>
+		<SourceSeverity></SourceSeverity>
+		<CVENames></CVENames>
+		<SANSID></SANSID>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Tue, 15 Feb 2022 16:48:12 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<DefaultAction ID="Action1">
+			<Description>
+				<PreLink>Click </PreLink>
+				<Link>here</Link>
+				<PostLink> to deploy this action.</PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell"><![CDATA[
+// Do not continue if nobody is logged on
+continue if {exists logged on users whose (active of it)}
+parameter "UserFolder"="{(preceding text of first "|" of it | it) of concatenation "|" of profile folders of users of logged on users whose (active of it)}\BESActionUI\{id of action as string}"
+folder delete "{parameter "UserFolder"}"
+folder create "{parameter "UserFolder"}"
+
+
+
+// Create the PowerShell script that will display an interface
+delete __createfile
+createfile until EOF_EOF_EOF_EOF
+# https://www.techotopia.com/index.php/Creating_GUIs_in_Windows_PowerShell_1.0_with_WinForms
+#
+# Load the Winforms assembly
+[reflection.assembly]::LoadWithPartialName( "System.Windows.Forms")
+
+$scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
+$outputFile="$scriptPath\output.txt"
+Write-Output "$myfile"
+
+# Create the form
+$form = New-Object Windows.Forms.Form
+
+#Set the dialog title
+$form.text = "BigFix Asks You To Do The Thing with a Parameter:"
+
+# Create the label control and set text, size and location
+$label = New-Object Windows.Forms.Label
+$label.Location = New-Object Drawing.Point 50,30
+$label.Size = New-Object Drawing.Point 200,15
+$label.text = "Enter your parameter response:"
+
+# Create TextBox and set text, size and location
+$textfield = New-Object Windows.Forms.TextBox
+$textfield.Location = New-Object Drawing.Point 50,60
+$textfield.Size = New-Object Drawing.Point 200,30
+
+# Create Button and set text and location
+$button = New-Object Windows.Forms.Button
+$button.text = "Proceed"
+$button.Location = New-Object Drawing.Point 75,90
+
+# Set up event handler to extract text from TextBox and display it on the Label and output it to the File
+$button.add_click({{
+$label.Text = "Doing Thing: " + $textfield.text
+Clear-Content -Path $outputFile
+Set-Content -Path $outputFile -Value ("Text = $($textfield.text)") 
+Add-Content -Path $outputFile -Value ("Result = OK")
+$form.close()
+})
+
+# Create Button and set text and location
+$closebutton = New-Object Windows.Forms.Button
+$closebutton.text = "Cancel"
+$closebutton.Location = New-Object Drawing.Point 180,90
+
+# Set up event handler to extract text from TextBox and display it on the Label.
+$closebutton.add_click({{ 
+
+Clear-Content -Path $outputFile
+Set-Content -Path $outputFile -Value ("Text = $($textfield.text)") 
+Add-Content -Path $outputFile -Value ("Result = CANCEL")
+
+$form.close() 
+})
+
+
+
+# Add the controls to the Form
+$form.controls.add($button)
+$form.controls.add($label)
+$form.controls.add($closebutton)
+$form.controls.add($textfield)
+
+# Display the dialog
+$form.ShowDialog()
+EOF_EOF_EOF_EOF
+
+// Copy the PowerShell script to the folder the user can read
+copy __createfile "{parameter "UserFolder"}\user-interface.ps1"
+//Execute the PowerShell UI as the current user
+
+action uses wow64 redirection false
+
+override wait
+hidden=false
+runas=currentuser
+wait powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "{parameter "UserFolder"}\user-interface.ps1"
+//wait cmd.exe /c "cd "{parameter "UserFolder"}" & powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "{parameter "UserFolder"}\user-interface.ps1" > debug.log 2>&1"
+
+parameter "OutputFile"="{parameter "UserFolder"}\output.txt"
+
+// Quit action if the user closed the dialog without providing a parameter
+continue if {exists file (parameter "OutputFile")}
+
+// Quit the action if the user clicked the "Cancel" button
+continue if {exists file (parameter "OutputFile") whose (key "Result" of it as trimmed string = "OK")}
+
+// Since we're taking user input, it's important to sanitize it - don't want to break out of the command execution by special characters.
+// The regex may depend on what we're expecting - here I allow characters, numbers, hyphens, underscodes, and spaces, # symbol, and period symbol
+parameter "UserInput"="{concatenation of matches(regex("[A-Za-z0-9\-\_\s\#\.]")) of keys "Text" of files (parameter "OutputFile")}"
+
+// This command executes as System, and does something with the user's input
+waithidden cmd.exe /c "echo Do Something with {parameter "UserInput"} > output-file.txt"]]></ActionScript>
+			<Settings>
+				<PreActionShowUI>false</PreActionShowUI>
+				<HasRunningMessage>false</HasRunningMessage>
+				<HasTimeRange>false</HasTimeRange>
+				<HasStartTime>false</HasStartTime>
+				<HasEndTime>true</HasEndTime>
+				<EndDateTimeLocalOffset>P2DT1H</EndDateTimeLocalOffset>
+				<HasDayOfWeekConstraint>false</HasDayOfWeekConstraint>
+				<UseUTCTime>false</UseUTCTime>
+				<ActiveUserRequirement>RequireUser</ActiveUserRequirement>
+				<ActiveUserType>AllUsers</ActiveUserType>
+				<HasWhose>false</HasWhose>
+				<PreActionCacheDownload>false</PreActionCacheDownload>
+				<Reapply>false</Reapply>
+				<HasReapplyLimit>true</HasReapplyLimit>
+				<ReapplyLimit>3</ReapplyLimit>
+				<HasReapplyInterval>false</HasReapplyInterval>
+				<HasRetry>false</HasRetry>
+				<HasTemporalDistribution>false</HasTemporalDistribution>
+				<ContinueOnErrors>true</ContinueOnErrors>
+				<PostActionBehavior Behavior="Nothing"></PostActionBehavior>
+				<IsOffer>false</IsOffer>
+			</Settings>
+			<SettingsLocks>
+				<ActionUITitle>false</ActionUITitle>
+				<PreActionShowUI>false</PreActionShowUI>
+				<PreAction>
+					<Text>false</Text>
+					<AskToSaveWork>false</AskToSaveWork>
+					<ShowActionButton>false</ShowActionButton>
+					<ShowCancelButton>false</ShowCancelButton>
+					<DeadlineBehavior>false</DeadlineBehavior>
+					<ShowConfirmation>false</ShowConfirmation>
+				</PreAction>
+				<HasRunningMessage>false</HasRunningMessage>
+				<RunningMessage>
+					<Text>false</Text>
+				</RunningMessage>
+				<TimeRange>false</TimeRange>
+				<StartDateTimeOffset>false</StartDateTimeOffset>
+				<EndDateTimeOffset>false</EndDateTimeOffset>
+				<DayOfWeekConstraint>false</DayOfWeekConstraint>
+				<ActiveUserRequirement>false</ActiveUserRequirement>
+				<ActiveUserType>false</ActiveUserType>
+				<Whose>false</Whose>
+				<PreActionCacheDownload>false</PreActionCacheDownload>
+				<Reapply>false</Reapply>
+				<ReapplyLimit>false</ReapplyLimit>
+				<RetryCount>false</RetryCount>
+				<RetryWait>false</RetryWait>
+				<TemporalDistribution>false</TemporalDistribution>
+				<ContinueOnErrors>false</ContinueOnErrors>
+				<PostActionBehavior>
+					<Behavior>false</Behavior>
+					<AllowCancel>false</AllowCancel>
+					<Deadline>false</Deadline>
+					<Title>false</Title>
+					<Text>false</Text>
+				</PostActionBehavior>
+				<IsOffer>false</IsOffer>
+				<AnnounceOffer>false</AnnounceOffer>
+				<OfferCategory>false</OfferCategory>
+				<OfferDescriptionHTML>false</OfferDescriptionHTML>
+			</SettingsLocks>
+		</DefaultAction>
+	</Task>
+</BES>
