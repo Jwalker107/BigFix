@@ -98,17 +98,16 @@ Example Report - New Relevant Content and Computer Properties &lt;br&gt;
 concatenation of trs of
 (
  concatenation "%0a"of (
-    td of (id of item 0 of it as string) /* computer default properties can be queried directly but must be cast to string */
-  ; td of name of item 0 of it /* computer default properties can be queried directly */
-  ; td of operating system of item 0 of it /* computer default properties can be queried directly */
-  ; td of (id  of item 1 of it as string) /* fixlet properties can be queried but must be cast to string */
+    td of (id of item 0 of it as string)     /* computer default properties can be queried directly but must be cast to string */
+  ; td of (name of item 0 of it  | "Not Reported" )  /* computer default properties can be queried directly */
+  ; td of operating system of item 0 of it   /* computer default properties can be queried directly */
+  ; td of (id  of item 1 of it as string)    /* fixlet properties can be queried but must be cast to string */
   ; td of display name of site of item 1 of it /* fixlet property */
-  ; td of name of item 1 of it /* fixlet name */
+  ; td of name of item 1 of it               /* fixlet name */
   ; td of (source severity of item 1 of it  | "")  /* Use pipe operator to handle potential missing fixlet property */
   ; td of (source release date of item 1 of it as string  | "" ) /* Use pipe operator to handle potential missing fixlet property */
-  ; td of item 2 of it /* computer property result */
-  ; td of item 3 of it /* computer property result */
-
+  ; td of item 2 of it                       /* computer property result */
+  ; td of item 3 of it                       /* computer property result */
   )
  ) 
 of
@@ -124,7 +123,6 @@ item 0 of it
  , item 2 of it /* property "IP Address" */
  , item 3 of it /* property "In Maintenance Window */
 ) whose (relevant flag of results (item 0 of it, item 1 of it))
-
 of
 (
   elements of item 0 of it /* computers */
@@ -146,9 +144,7 @@ of (
       )
  , bes properties whose (reserved flag of it and name of it = "IP Address")
  , bes properties whose (custom flag of it and name of it = "In Maintenance Window")
-
 )
-
 ?&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
