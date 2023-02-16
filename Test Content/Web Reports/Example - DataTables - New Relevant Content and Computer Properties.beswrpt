@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BESWebReport>
+	<Name>Example - New Relevant Content and Computer Properties</Name>
+	<Description></Description>
+	<Type>CustomReport</Type>
+	<Source></Source>
+	<Data>&lt;!-- import jQuery --&gt;
+&lt;script type="text/javascript" charset="utf8" src='https://code.jquery.com/jquery-3.4.1.js'&gt;&lt;/script&gt;
+&lt;!-- import styles for dataTables and dataTables Buttons extension --&gt;
+&lt;link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css"&gt;
+&lt;link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css"&gt;
+&lt;!-- import javascript for dataTables and dataTables Buttons extension --&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.flash.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.html5.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+$(document).ready(function() {
+   buildResults();
+});
+function buildResults() {
+ var table = $('#table1').DataTable( {
+        orderCellsTop: true,
+        fixedHeader: true,
+        autowidth: true,
+        paging: true,
+        //scrollX: true,
+        //scrollY: true,
+        "lengthMenu": [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
+                dom: 'lBfrtlip',
+        buttons: [
+            {extend: 'copy', title: ''},
+            'csv', 
+           { extend: 'excel', title: ''},
+           'pdf', 'print'
+        ],
+     
+    } );
+   // Clone the header row so we can add search filters on each column
+    $('#table1 thead tr').clone(true).appendTo( '#table1 thead' );
+    $('#table1 thead tr:eq(1) th').each( function (i) {
+        var title = $(this).text();
+        $(this).html( '&lt;input type="text" placeholder=" '+title+'" /&gt;' );
+ 
+        $( 'input', this ).on( 'keyup change', function () {
+            if ( table.column(i).search() !== this.value ) {
+                table
+                    .column(i)
+                    .search( this.value )
+                    .draw();
+            }
+       } );
+  } );
+table.draw();
+document.getElementById("table1").style.visibility = "visible";
+document.getElementById("table1").style.display= "inherit";
+} 
+&lt;/script&gt;
+&lt;style&gt; 				
+.header {
+	font-size: 14px;
+	background-color: #990000;
+	color: white;
+	padding: 6px 40px 6px 10px;
+	white-space: wrap;
+}
+.row {
+	font-size: 14px;
+	padding: 6px 40px 6px 10px;
+	border: 1px solid black;
+	border-top: none;
+}
+.nowrap {
+	white-space: nowrap;
+} 			
+&lt;/style&gt; 			
+&lt;div id="seed_2" style="border: 5px solid #1976d2; border-top: none;"&gt;
+ 	&lt;div style="background-color: #1976d2; color: white; padding: 5px 5px 5px 5px;"&gt;
+&lt;!-- Encoded image  of the  logo  goes here--&gt;
+	&lt;/div&gt;
+&lt;!-- Whitespace below here so you can scroll down to the content without the image CSS slowing the browser view --&gt;
+	&lt;div style="padding: 20px; font-size: 18px; font-family: sans-serif; font-weight: 300;"&gt;
+	&lt;div style=""&gt;
+Example Report - New Relevant Content and Computer Properties &lt;br&gt;
+	&lt;/div&gt;
+		
+&lt;div id="tableDiv" style="overflow:auto"&gt;
+&lt;table name='table1' id='table1' class='display' border='all' width="100%" style="visibility:hidden; display:none"&gt;
+&lt;thead&gt;
+&lt;?relevance concatenation of ths of substrings separated by ";" of "ComputerID; ComputerName; OS; FixletID; FixletSite;FixletName; FixletSeverity;FixletSourceRelease;IPAddresses;In Maintenance Window" ?&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;?relevance
+concatenation of trs of
+(
+ concatenation "%0a"of (
+    td of (id of item 0 of it as string) /* computer default properties can be queried directly but must be cast to string */
+  ; td of name of item 0 of it /* computer default properties can be queried directly */
+  ; td of operating system of item 0 of it /* computer default properties can be queried directly */
+  ; td of (id  of item 1 of it as string) /* fixlet properties can be queried but must be cast to string */
+  ; td of display name of site of item 1 of it /* fixlet property */
+  ; td of name of item 1 of it /* fixlet name */
+  ; td of (source severity of item 1 of it  | "")  /* Use pipe operator to handle potential missing fixlet property */
+  ; td of (source release date of item 1 of it as string  | "" ) /* Use pipe operator to handle potential missing fixlet property */
+  ; td of item 2 of it /* computer property result */
+  ; td of item 3 of it /* computer property result */
+
+  )
+ ) 
+of
+(
+item 0 of it
+, item 1 of it
+, unique value of concatenation ";" of values of results (item 0 of it, item 2 of it) 
+, unique value of concatenation ";" of values of results (item 0 of it, item 3 of it)  
+) of
+(
+   item 0 of it /* one computer */
+ , elements of item 1 of it /* fixlets */
+ , item 2 of it /* property "IP Address" */
+ , item 3 of it /* property "In Maintenance Window */
+) whose (relevant flag of results (item 0 of it, item 1 of it))
+
+of
+(
+  elements of item 0 of it /* computers */
+ , item 1 of it /* fixlet set */
+ , item 2 of it /* property "IP Address" */
+ , item 3 of it /* property "In Maintenance Window */
+) 
+of (
+   set of bes computers  /* Filter BES Computers here if possible */
+ , set of fixlets    /* Filter BES Fixlets here */
+     whose (
+     fixlet flag of it  /* exclude Tasks */
+     and current date - source release date of it &lt; 45 * day  /* Only recent things */
+     and applicable computer count of it &gt; 0   /* Only fixlets that have at least one applicable computer */
+    ) of all bes sites  /* Filter BES Fixlet Sites here */
+      whose (
+        external site flag of it
+        and (display name of it starts with "Patches" or display name of it starts with "Updates")
+      )
+ , bes properties whose (reserved flag of it and name of it = "IP Address")
+ , bes properties whose (custom flag of it and name of it = "In Maintenance Window")
+
+)
+
+?&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id="results" style="visibility:hidden"&gt;I am invisible replace me &lt;/div&gt;</Data>
+	<Doctype></Doctype>
+	<URLParameters>#filterManager=%7b%22filterName%22:%22%22,%22filterID%22:%22%22%7d</URLParameters>
+	<SourcePage>CustomReport</SourcePage>
+</BESWebReport>
