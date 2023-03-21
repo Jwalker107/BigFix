@@ -15,7 +15,7 @@ import os
 ### Configuration settings ###
 server="https://bes-root.local:52311"
 username="mo"
-password="BES-Dev-1"
+password="Not Gonna Get Me Today!"
 
 server_repo="/api/task/custom/Temp"
 localdir="C:\\Temp\\apitest\\Temp\\task"
