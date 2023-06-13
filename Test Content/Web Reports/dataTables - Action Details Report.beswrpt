@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BESWebReport>
+	<Name>dataTables - Action Detail Report</Name>
+	<Description></Description>
+	<Type>CustomReport</Type>
+	<Source></Source>
+	<Data>&lt;!-- import jQuery --&gt;
+&lt;script type="text/javascript" charset="utf8" src='https://code.jquery.com/jquery-3.4.1.js'&gt;&lt;/script&gt;
+&lt;!-- import styles for dataTables and dataTables Buttons extension --&gt;
+&lt;link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css"&gt;
+&lt;link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css"&gt;
+&lt;!-- import javascript for dataTables and dataTables Buttons extension --&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.flash.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.html5.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+$(document).ready(function() {
+   buildResults();
+});
+function buildResults() {
+
+ var table = $('#table1').DataTable( {
+        orderCellsTop: true,
+        fixedHeader: true,
+        autowidth: true,
+        paging: true,
+        //scrollX: true,
+        //scrollY: true,
+        "lengthMenu": [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
+                dom: 'lBfrtlip',
+        buttons: [
+            {extend: 'copy', title: ''},
+            'csv', 
+           { extend: 'excel', title: ''},
+           'pdf', 'print'
+        ],
+     
+    } );
+   // Clone the header row so we can add search filters on each column
+    $('#table1 thead tr').clone(true).appendTo( '#table1 thead' );
+    $('#table1 thead tr:eq(1) th').each( function (i) {
+        var title = $(this).text();
+        $(this).html( '&lt;input type="text" placeholder=" '+title+'" /&gt;' );
+ 
+        $( 'input', this ).on( 'keyup change', function () {
+            if ( table.column(i).search() !== this.value ) {
+                table
+                    .column(i)
+                    .search( this.value )
+                    .draw();
+            }
+       } );
+  } );
+table.draw();
+document.getElementById("table1").style.visibility = "visible";
+document.getElementById("table1").style.display= "inherit";
+} 
+&lt;/script&gt;
+&lt;style&gt; 				
+.header {
+	font-size: 14px;
+	background-color: #990000;
+	color: white;
+	padding: 6px 40px 6px 10px;
+	white-space: wrap;
+}
+.row {
+	font-size: 14px;
+	padding: 6px 40px 6px 10px;
+	border: 1px solid black;
+	border-top: none;
+}
+.nowrap {
+	white-space: nowrap;
+} 			
+&lt;/style&gt; 			
+&lt;div id="seed_2" style="border: 5px solid #1976d2; border-top: none;"&gt;
+ 	&lt;div style="background-color: #1976d2; color: white; padding: 5px 5px 5px 5px;"&gt;
+	&lt;/div&gt;
+	&lt;div style="padding: 20px; font-size: 18px; font-family: sans-serif; font-weight: 300;"&gt;
+	&lt;div style=""&gt;
+Action History Details
+	&lt;/div&gt;
+
+&lt;div id="tableDiv" style="overflow:auto"&gt;
+&lt;table name='table1' id='table1' class='display' border='all' width="100%" style="visibility:hidden; display:none"&gt;
+&lt;thead&gt;
+&lt;?relevance concatenation of ths of substrings separated by ";" of "Computer ID;Computer Name;Computer Groups;Parent Action ID;Parent Action Name;Action ID;Action Name;Issuer;Time Issued;Result;Exit Code;End Time" ?&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;?relevance
+concatenation of trs of
+(
+ concatenation "%0a"of (td of item 0 of it; td of  item 1 of it; td of item 2 of it; td of item 3 of it;td of  item 4 of it; td of item 5 of it; td of item 6 of it;td of  item 7 of it;td of  item 8 of it;td of  item 9 of it; td of item 10 of it;td of  item 11 of it)
+) of
+(
+item 4 of it as string/* computer id */
+, item 5 of it /* computer name */
+, item 3 of it /* computer groups string */
+, ((if group member flag of it then id of parent group of it as string else "") of item 1 of it as string | "")
+, ((if group member flag of it then link of parent group of it  else "" as html) of item 1 of it  | "" as html)
+, id of item 1 of it as string | ""
+, link of item 1 of it | "" as html
+, name of issuer of item 1 of it | ""
+, time issued of item 1 of it as string | ""
+, status of item 2 of it as string | ""
+, exit code of item 2 of it as string | ""
+, end time of item 2 of it as string | ""
+) of
+(
+item 0 of it /* computer */
+, action of item 1 of it /* action */
+, item 1 of it /* action result */
+, item 2 of it /* computer groups */
+, item 3 of it /* computer id */
+, item 4 of it /* computer name */
+) of 
+(
+item 0 of it /* computer object */
+, action results of item 0 of it /* action results for computer */
+, item 1 of it /* computer groups */
+, item 2 of it /* computer id */
+, item 3 of it /* computer name */
+) of
+(
+it
+, (concatenation ";" of names of bes computer groups of it | "None") /* computer groups is expensive - so only lookup once per computer*/
+, id of it as string | "No computer ID"
+, link of it | "Unknown" as html
+) of
+(
+bes computers
+)
+?&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</Data>
+	<Doctype></Doctype>
+	<URLParameters>#filterManager=%7b%22filterName%22:%22%22,%22filterID%22:%22%22%7d</URLParameters>
+	<SourcePage>CustomReport</SourcePage>
+</BESWebReport>
