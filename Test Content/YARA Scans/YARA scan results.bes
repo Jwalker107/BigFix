@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Analysis>
+		<Title>YARA scan results</Title>
+		<Description><![CDATA[<P>Reports on results of YARA scans taken on the endpoints.</P>
+<P>Note: This analysis specifically excludes results found in the BESClient folder or BESClient active processes due to known false-positives (for example a scan matching against its own signature, embedded in a Fixlet file).&nbsp; To view results including results against the BESClient itself, check the original yara scan output on the endpoint itself.</P>]]></Description>
+		<Relevance>(if exists property "in proxy agent context" then not in proxy agent context else true)</Relevance>
+		<Relevance>exists files "yara_version.txt" of folders "yara" of parent folder of parent folder of client folder of site "actionsite" </Relevance>
+		<Source>Internal</Source>
+		<SourceReleaseDate>2022-03-18</SourceReleaseDate>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Fri, 16 Jun 2023 17:13:52 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<Property Name="YARA scan count" ID="1" EvaluationPeriod="PT1H">number of find files "*.json" of folders "results" of folders "yara" of parent folder of parent folder of client folder of site "actionsite"</Property>
+		<Property Name="YARA most recent scan" ID="2" EvaluationPeriod="PT1H">maxima of (it as string as time) of values of keys "scan_completion_time" of jsons of find files "*.json" whose (exists it whose (exists json of it))  of folders "results" of folders "yara" of parent folder of parent folder of client folder of site "actionsite"</Property>
+		<Property Name="YARA scans taken" ID="3" EvaluationPeriod="PT1H">(concatenation "|" of (value of key "signature_shortname" of it as string ; value of key "scan_target" of it as string ; value of key "scan_paths" of it as string  ) of jsons of it) of find files "*.json" whose (exists it whose (exists json of it)) of folders "results" of folders "yara" of parent folder of parent folder of client folder of site "actionsite"</Property>
+		<Property Name="YARA matches found" ID="5" EvaluationPeriod="PT1H">(concatenation "||" of (item 0 of it; item 1 of it; item 2 of it; item 0 of item 3 of it; item 1 of item 3 of it)) of (values of keys "signature_shortname" of it as string, values of keys "scan_target" of it as string, value of key "scan_paths" of it as string , (values of keys "Detection" of it as string, (if exists keys whose (name of it = "file") of it then values whose (it as string as lowercase does not start with pathname of storage folder of client as lowercase) of key "file" of it as string else if exists keys whose (name of it = "process_name") of it then values whose (it as string as lowercase != "besclient" and it as string as lowercase != "besclient.exe") of key "process_name" of it as string else  "unknown")) of elements of values of keys "results" of it) of jsons of find files "*.json" whose (exists it whose (exists json of it))  of folders "results" of folders "yara" of parent folder of parent folder of client folder of site "actionsite"</Property>
+		<Property Name="YARA signatures" ID="8" EvaluationPeriod="PT1H">preceding texts of lasts ".yar" of names of find files "*.yar" of folders "signatures" of folders "yara" of parent folder of parent folder of client folder of site "actionsite"</Property>
+		<Property Name="YARA Scan Results - Corrupt Scan Result Files" ID="12" EvaluationPeriod="PT1H">names of find files ("*.json") whose (not exists it whose (exists json of it)) of folders "results" of folders "yara" of parent folder of parent folder of client folder of site "actionsite"</Property>
+	</Analysis>
+</BES>
