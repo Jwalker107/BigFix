@@ -7,16 +7,13 @@ The account to be tested must have the 'Can use REST API' right assigned
 # requires "pip install requests"
 import requests
 
-# to suppress SSL "untrusted certificate" warnings
-import warnings
-
-# Suppress InsecureRequestWarning warnings from requests module
-#  These are generated when we do not have a trusted CA certificate on the BES Server
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 # tqdm progress bar, requires 'pip install tqdm'
 from tqdm.auto import tqdm, trange
 from time import sleep
 
+# Suppress InsecureRequestWarning warnings from requests module
+#  These are generated when we do not have a trusted CA certificate on the BES Server
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # server connection parameters
@@ -27,7 +24,7 @@ url = "https://bes-root.domain.home:52311/api/login" # root server api login url
 username = "TestUser1@d.domain.home"
 # username = "D\\TestUser1"  
 # username = "TestUser1"
-password = "## NOT TODAY ##"                
+password = "## NOT TODAY##"                
 
 pbar = trange(50) # Number of attempts to make
 count_success = 0   # number of successful logins
