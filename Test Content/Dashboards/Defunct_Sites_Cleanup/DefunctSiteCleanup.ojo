@@ -1,0 +1,436 @@
+<?xml version="1.0"?>
+<!-- vim: set syntax=xml: -->
+<BES>
+  <Wizard>
+    <Title>BPS - Defunct Sites Cleanup</Title>
+    <UIHooks LaunchType="Document" RequiresAuthoring="false" Menu="Dashboards"></UIHooks>
+    <DefaultPage>DefaultPage</DefaultPage>
+    <Page Name="DefaultPage" DocType="HTML5" >
+        <Title>BigFix Professional Services - Defunct Sites Cleanup (WORK-IN-PROGRESS) </Title>
+        <Head><![CDATA[
+            <meta http-equiv="X-UA-Compatible" content="IE=11">
+            <script>window.onerror = function(event, source, lineno, colno, error){ if( -1 != source.toString().indexOf("/wizards.js") && 0 == lineno && 0 == colno) { return true; } };</script>
+        ]]></Head>
+        <HTML><![CDATA[
+<link rel="stylesheet" type="text/css" href="HCL-BPS-style.css">		
+<!-- <script language="javascript">InsertUtilityDiv();</script> -->
+
+<script language="javascript">
+    function ImportToSite() {
+        try {
+            var result, zero;
+            strXML=document.getElementById('XML').value;
+            strSite=document.getElementById('Site').value;
+            //alert("Site is " + strSite);
+            //alert("XML is " + strXML);
+            result= (ImportXMLToSite(strXML,strSite,true));
+        }
+        catch (e) {
+            //alert('Error: ' + e.message + '\nStatement:\n' + strRelevance);
+            alert('Error: ' + e.message);
+                }
+        
+        }
+	   
+    function BuildXML (strTitle,strDescription,strRelevance,strActionScript) {
+        // Query defunct Operator Sites that are subscribed by clients, and create a Fixlet to remove them
+        strXML='<?xml version="1.0" encoding="UTF-8"?>'
+            + '<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">\n'
+	        + '<Fixlet>\n';
+        //alert("Get Title");
+		
+        // This is tricky.  Because the entire Dashboard is basically inside of a CDATA tag, and there is absolutely no way to embed CDATA within CDATA, we have to close 
+		//  the Dasboard's CDATA tag so that we can embed literal CDATA tags into each of the XML fields that might contain cdata.
+		
+		strXML=strXML + '<Title>]]>&lt;![CDATA['+ strTitle + ']]&gt;<![CDATA[</Title>\n';
+        //alert("Get Description");
+        
+		
+		strXML=strXML + '<Description>]]>&lt;![CDATA['+ strDescription + ']]&gt;<![CDATA[</Description>\n';
+        //alert("Get Relevance");
+        strXML=strXML + '<Relevance>]]>&lt;![CDATA['+ strRelevance + ']]&gt;<![CDATA[</Relevance>\n';
+        strXML=strXML + ''
+            + ' <Category>BES Management</Category>\n'
+		    + ' <Source>HCL BigFix Professional Services / J. Walker</Source>\n'
+		    + ' <SourceID></SourceID>\n'
+		    + ' <SourceReleaseDate>2020-04-07</SourceReleaseDate>\n'
+		    + ' <SourceSeverity></SourceSeverity>\n'
+		    + ' <CVENames></CVENames>\n'
+		    + ' <SANSID></SANSID>\n'
+		    + ' <Domain>BESC</Domain>\n'
+		    + ' <DefaultAction ID="Action1">\n'
+			+ '     <Description>\n'
+			+ '         <PreLink>Click </PreLink>\n'
+			+ '         <Link>here</Link>\n'
+			+ '         <PostLink> to deploy this action.</PostLink>\n'
+            + '     </Description>\n';
+        
+		strXML=strXML + '<ActionScript>]]>&lt;![CDATA[' + strActionScript + ']]&gt;<![CDATA[</ActionScript>\n';
+        strXML=strXML + '</DefaultAction>\n'
+            + ' </Fixlet>\n'
+            + '</BES>';
+        
+        document.getElementById('XML').value=strXML;
+    }   
+
+     function OperatorSites () {
+	    //alert("Button visibility: " + window.getComputedStyle(document.getElementById("btnImportToSite"),null).getPropertyValue('visibility'));
+		                              
+        strTimeQuery='now';
+        strTime=EvaluateRelevance(strTimeQuery);
+        strTitle='Defunct Sites - Deleted Operator Site Cleanup ' + strTime;
+        document.getElementById('Title').value=strTitle;
+
+        strDescription='Defunct Operator Cleanup<br>'
+         + ' Unsubcribes computers from operator sites, where the operators that were not found in the deployment at the time this fixlet was generated.<br>'
+         + ' Generated: ' + strTime ;
+         
+        document.getElementById('Description').value=strDescription
+
+        strSiteQuery='elements of (item 1 of it - item 0 of it) of (set of masthead operator names of bes users,  set of values  of results of bes properties whose (reserved flag of it and name of it = "Client Administrators"))';
+        //alert('Querying for defunct operators, this may take some time');
+        var arySites=EvaluateRelevance(strSiteQuery);
+     
+        strJoinedSites='"' + arySites.join('"; "') + '"';
+        strRelevance='size of intersection of (set of names of administrators whose (not exists effective dates whose (it > "' + strTime + '" as time) of it) of client; set of (' + strJoinedSites + ')) > 0';
+        document.getElementById('Relevance').value = strRelevance;
+
+        //strActionScriptQuery='concatenation "%0a" of ("setting %22__Group___AdminBy_" & it & "%22=%22{ false }%22 on %22" & now as string & "%22 for client";"administrator delete %22" & it & "%22 on %22" & now as string & "%22") of unique values whose (it is not contained by set of masthead operator names of bes users) of values of results of bes properties whose (reserved flag of it and name of it = "Client Administrators")';
+        //alert('Querying for defunct operators, this may take some time');
+		//strActionScript=EvaluateRelevance(strActionScriptQuery);
+        var strActionScript='';
+        strActionScript +=''
+        + '//Remove individual opsites for operators that were removed from the deployment\n'
+        + '// Generated: ' + strTime + '\n';
+
+        for (i in arySites) {
+            strActionScript +=''
+            + 'setting "__Group___AdminBy_' + arySites[i] + '"="{ false }" on "' + strTime + '" for client\n'
+            + '// Check whether the operator is still valid (based on subscribe time, operator could have been added after this fixlet was generated) \n'
+            + 'if { value of setting "__Group___AdminBy_' + arySites[i] + '" of client = "True" }\n'
+            + '  administrator add "' + arySites[i] + '" on "' + strTime + '"\n'
+            + 'else\n'
+            + '  administrator delete "' + arySites[i] + '" on "' + strTime + '"\n'
+            + 'endif\n'
+            + '\n'
+            ;
+        }        
+
+        document.getElementById('ActionScript').value=strActionScript;
+
+        BuildXML (strTitle,strDescription,strRelevance,strActionScript); 
+		if (window.getComputedStyle(document.getElementById("btnImportToSite"),null).getPropertyValue('visibility')=="hidden") {
+			ImportToSite();
+		}
+    }
+
+    function PromotedMasterOperatorSites () {
+	    //alert("Button visibility: " + window.getComputedStyle(document.getElementById("btnImportToSite"),null).getPropertyValue('visibility'));
+		                              
+        strTimeQuery='now';
+        strTime=EvaluateRelevance(strTimeQuery);
+        strTitle='Defunct Sites - Promoted Operator Cleanup ' + strTime;
+        document.getElementById('Title').value=strTitle;
+
+        strDescription='Promoted Operator Cleanup<br>'
+         + ' Unsubcribes computers from individual operator sites, for operators that later promoted to Master Operators.<br>'
+         + ' Generated: ' + strTime ;
+         
+        document.getElementById('Description').value=strDescription
+
+        //strRelevanceQuery='"exists administrators whose (not exists effective date whose (it > %22" & now as string & "%22 as time ) of it AND name of it is contained by set of (%22%22" & concatenation of ("; %22" & it & "%22" ) of unique values whose (it is not contained by set of masthead operator names of bes users) of values of results of bes properties whose (reserved flag of it and name of it = "Client Administrators") & ")) of client"';
+        //alert('Querying for defunct operators, this may take some time');
+		//strRelevance=EvaluateRelevance(strRelevanceQuery);
+        
+        var strSiteQuery='elements of intersection of (item 1 of it ; item 0 of it) of (set of values of results of bes properties whose (reserved flag of it and name of it = "Client Administrators") , set of masthead operator names of bes users whose (master flag of it))';
+        var arySites=EvaluateRelevance(strSiteQuery);
+						
+		//alert (' arySiteURLs is ' + arySiteURLs);
+        
+        strJoinedSites='"' + arySites.join('"; "') + '"';
+
+        strRelevance='size of intersection of (set of names of administrators whose (not exists effective dates whose (it > "' + strTime + '" as time) of it) of client; set of (' + strJoinedSites + ')) > 0';
+        document.getElementById('Relevance').value = strRelevance;
+
+        //strActionScriptQuery='concatenation "%0a" of ("setting %22__Group___AdminBy_" & it & "%22=%22{ false }%22 on %22" & now as string & "%22 for client";"administrator delete %22" & it & "%22 on %22" & now as string & "%22") of unique values whose (it is not contained by set of masthead operator names of bes users) of values of results of bes properties whose (reserved flag of it and name of it = "Client Administrators")';
+        //alert('Querying for defunct operators, this may take some time');
+		//strActionScript=EvaluateRelevance(strActionScriptQuery);
+        var strActionScript='';
+        strActionScript +=''
+        + '//Remove individual opsites for operators that were promoted to Master Operator\n'
+        + '// Generated: ' + strTime + '\n';
+
+        for (i in arySites) {
+            strActionScript +=''
+            + 'setting "__Group___AdminBy_' + arySites[i] + '"="{ false }" on "' + strTime + '" for client\n'
+            + 'if { value of setting "__Group___AdminBy_' + arySites[i] + '" of client = "True" }\n'
+            + '  administrator add "' + arySites[i] + '" on "' + strTime + '"\n'
+            + 'else\n'
+            + '  administrator delete "' + arySites[i] + '" on "' + strTime + '"\n'
+            + 'endif\n'
+            + '\n'
+            ;
+        }        
+
+        document.getElementById('ActionScript').value=strActionScript;
+
+        BuildXML (strTitle,strDescription,strRelevance,strActionScript); 
+		if (window.getComputedStyle(document.getElementById("btnImportToSite"),null).getPropertyValue('visibility')=="hidden") {
+			ImportToSite();
+		}
+
+    }
+    function CustomSites() {
+        // Query defunct Custom Sites that are subscribed by clients, and create a Fixlet to remove them
+		
+		var strTimeQuery='now';
+        var strTime=EvaluateRelevance(strTimeQuery);
+        var strTitle='Defunct Sites - Deleted Custom Site Cleanup ' + strTime;
+        document.getElementById('Title').value=strTitle;
+
+        var strDescription='Defunct Custom Site Cleanup<br>'
+         + ' Unsubscribes computers from defunct Custom Sites that were found in the deployment at the time this fixlet was generated.<br>'
+         + ' Generated: ' + strTime ;
+         
+        document.getElementById('Description').value=strDescription
+        strTimeQuery='now';
+        strTime=EvaluateRelevance(strTimeQuery);
+        strTitle='Defunct Sites - Deleted Custom Sites Cleanup ' + strTime;
+        document.getElementById('Title').value=strTitle;
+
+        strDescription='Deleted Custom Sites Cleanup<br>'
+         + ' Unsubcribes computers from individual custom sites, for sites that later removed.<br>'
+         + ' Generated: ' + strTime ;
+        document.getElementById('Description').value=strDescription
+
+        var strSiteURLQuery='elements of (item 1 of it - item 0 of it) of (set of urls of bes custom sites,  set of values whose (following text of last "/" of it starts with "CustomSite_") of  results of bes properties whose (reserved flag of it and name of it = "Subscribed Sites"))';
+        var arySiteURLs=EvaluateRelevance(strSiteURLQuery);
+        var strJoinedSiteURLs='"' + arySiteURLs.join('"; "') + '"';
+        
+        // d'oh this isn't going to work - these are *deleted* sites, won't have a result here</br></br>
+        var strSiteNameQuery='following texts of lasts "/" of (' + strJoinedSiteURLs +')';
+        var arySiteNames=EvaluateRelevance(strSiteNameQuery);
+        
+        strRelevance='size of intersection of (set of urls of sites whose (not exists subscribe times whose (it > "' + strTime + '" as time) of it); set of (' + strJoinedSiteURLs + ')) > 0';
+        document.getElementById('Relevance').value = strRelevance;
+
+        var strActionScript='';
+        strActionScript +=''
+        + '//Remove custom sites for sites that were promoted to Master Operator\n'
+        + '// Generated: ' + strTime + '\n';
+
+        for (i in arySiteNames) {
+            strActionScript +=''
+            + 'custom site unsubscribe "' + arySiteNames[i] + '" on "{ "' + strTime +  '" }"\n'
+            ;
+        }        
+
+        document.getElementById('ActionScript').value=strActionScript;
+
+        BuildXML (strTitle,strDescription,strRelevance,strActionScript); 
+		if (window.getComputedStyle(document.getElementById("btnImportToSite"),null).getPropertyValue('visibility')=="hidden") {
+			ImportToSite();
+		}
+    }
+    
+    function ExternalSites() {
+       // Query defunct Custom Sites that are subscribed by clients, and create a Fixlet to remove them
+        strTimeQuery='now';
+        strTime=EvaluateRelevance(strTimeQuery);
+        strTitle='Defunct Sites - Deleted External Site Cleanup ' + strTime;
+        document.getElementById('Title').value=strTitle;
+
+        strDescription='Defunct External Site Cleanup<br>'
+         + ' Unsubscribes computers from defunct External Sites that were found in the deployment at the time this fixlet was generated.<br>'
+         + ' Generated: ' + strTime  + '<br>'
+         + '<br>'
+         + 'Removing external sites requires restarting the client during the action.  The client will initially report Failed for the action as the client is shut down while the action is running.<br>'
+         ;
+         
+        document.getElementById('Description').value=strDescription
+
+        //strRelevanceQuery='"exists sites whose (url of it is contained by set of (%22%22" & concatenation of ("; %22" & it & "%22") of unique values whose (it is not contained by set of urls of all bes sites) of values whose ((it does not start with "mailboxsite" and it does not start with "CustomSite_") of following text of last "/" of it) of results of bes properties whose (reserved flag of it and name of it = "Subscribed Sites") & "))"';
+        //alert('Querying for defunct External Sites, this may take some time');
+		//strRelevance=EvaluateRelevance(strRelevanceQuery);
+        var strSiteURLsQuery='unique values whose (it is not contained by set of urls of all bes sites) of values whose ((it does not start with "mailboxsite" and it does not start with "CustomSite_") of following text of last "/" of it) of results of bes properties whose (reserved flag of it and name of it = "Subscribed Sites")';
+        var arySiteURLs=EvaluateRelevance(strSiteURLsQuery);
+						
+		//alert (' arySiteURLs is ' + arySiteURLs);
+        
+        strJoinedSiteURLs='"' + arySiteURLs.join('"; "') + '"';
+		//alert('Joined is ' + strJoinedSiteURLs);
+        strRelevance='size of intersection of (set of (urls of sites whose (not exists subscribe times whose (it > "' + strTime + '" as time) of it) as lowercase) ; set of ((' + strJoinedSiteURLs +') as lowercase)) > 0';
+
+
+        document.getElementById('Relevance').value = strRelevance;
+
+        strJoinedSiteURLSQLite='SiteURL LIKE \'' + arySiteURLs.join('\' OR SiteURL LIKE \'') + '\'';
+
+        // Todo  - could make a better effort to look at subscribe times here
+        strActionScript=''
++ ' // external site cleanup actionscript\n'
++ ' if {name of operating system starts with "Win"}\n'
++ '    delete __appendfile\n'
++ '    appendfile net.exe stop besclient\n'
++ '    appendfile taskkill /im besclient.exe /f\n'
++ '    \n'
++ '    // cleanup defunct sites here\n';
+
+strActionScript =  strActionScript + ''
++ '    appendfile {concatenation "%0d%0a" of ("rd /s /q %22" & pathname of it & "%22") of folders( (it as string) of '
++      ' columns "SiteName" of rows of statement "select SiteName, SiteURL from SITEDATA_INFO WHERE ' 
++      strJoinedSiteURLSQLite + '" of sqlite database of file "SiteData.db" of data folder of client) of data folder of client}\n';
+
+strActionScript = strActionScript + ''
++ '    appendfile net.exe start besclient\n'
++ '    delete cleanup.cmd\n'
++ '    move __appendfile cleanup.cmd\n'
++ '    waithidden cmd.exe /c cleanup.cmd\n'
++ ' \n'
++ ' elseif {((if (version of client >= "8.0") then (mac of it) else (name of it starts with "Mac OS X")) of operating system) AND ((exists folder "/Library/BESAgent/BESAgent.app/") OR (exists folder "/Library/StartupItems/BESAgent/BESAgent.app/"))}\n'
++ ' 	delete "{(client folder of current site as string) & "/__appendfile"}"\n'
++ ' 	appendfile #!/bin/sh\n'
++ ' 	appendfile sleep 5\n'
++ ' \n'
++ ' 	if {((version of client > "7.1") AND (exists file "/Library/LaunchDaemons/BESAgentDaemon.plist") AND (system version >= "10.4"))}\n'
++ ' 		appendfile /bin/launchctl unload /Library/LaunchDaemons/BESAgentDaemon.plist\n'
++ ' 		appendfile sleep 5\n'
++ ' 		// cleanup defunct sites here\n';
+
+strActionScript += ''
++ '         appendfile {concatenation "%0a" of ("rm -rf %22" & pathname of it & "%22") of folders( (it as string) of '
++         ' columns "SiteName" of rows of statement "select SiteName, SiteURL from SITEDATA_INFO WHERE ' 
++          strJoinedSiteURLSQLite + '" of sqlite database of file "SiteData.db" of data folder of client) of data folder of client}\n';
+
+strActionScript += ''
++ ' 		appendfile /bin/launchctl load /Library/LaunchDaemons/BESAgentDaemon.plist\n'
++ ' 	else\n'
++ ' 		appendfile /sbin/SystemStarter stop BESAgent\n'
++ ' 		appendfile sleep 5\n'
++ ' 		// cleanup defunct sites here\n';
+
+strActionScript += ''
++ '         appendfile {concatenation "%0a" of ("rm -rf %22" & pathname of it & "%22") of folders( (it as string) of '
++         ' columns "SiteName" of rows of statement "select SiteName, SiteURL from SITEDATA_INFO WHERE ' 
++         strJoinedSiteURLSQLite + '" of sqlite database of file "SiteData.db" of data folder of client) of data folder of client}\n';
+
+strActionScript += ''
++ ' 		appendfile /sbin/SystemStarter start BESAgent\n'
++ ' 	endif\n'
++ ' \n'
++ ' 	wait chmod 555 "{(client folder of current site as string) & "/__appendfile"}"\n'
++ ' 	run {"/bin/sh -c %22trap \'\' 15;\'" & (client folder of current site as string) & "/__appendfile\'%22"}\n'
++ ' \n'
++ ' elseif {(name of operating system starts with "Linux") AND (if (version of client < "8") then (exists file ("/etc/init.d/BESClient-" & version of client as string)) else (exists file "/etc/init.d/besclient"))}\n'
++ ' 	appendfile #!/bin/sh\n'
++ ' 	appendfile sleep 5\n'
++ ' 	if {version of client < "8"}\n'
++ ' 		appendfile /etc/init.d/BESClient-{version of client} stop\n'
++ ' 		appendfile sleep 5\n';
+
+strActionScript += ''
++ '         appendfile {concatenation "%0a" of ("rm -rf %22" & pathname of it & "%22") of folders( (it as string) of '
++         ' columns "SiteName" of rows of statement "select SiteName, SiteURL from SITEDATA_INFO WHERE ' 
++         strJoinedSiteURLSQLite + '" of sqlite database of file "SiteData.db" of data folder of client) of data folder of client}\n';
+   
+strActionScript += ''
++ ' 		appendfile /etc/init.d/BESClient-{version of client} start\n'
++ ' 	else\n'
++ ' 		appendfile /etc/init.d/besclient stop\n'
++ ' 		// cleanup defunct sites here\n';
+
+strActionScript += ''
++ '         appendfile {concatenation "%0a" of ("rm -rf %22" & pathname of it & "%22") of folders( (it as string) of '
++          ' columns "SiteName" of rows of statement "select SiteName, SiteURL from SITEDATA_INFO WHERE ' 
++          strJoinedSiteURLSQLite + '" of sqlite database of file "SiteData.db" of data folder of client) of data folder of client}\n';
+   
+strActionScript += ''
++ ' 		appendfile /etc/init.d/besclient start\n'
++ ' 	endif\n'
++ ' 	wait chmod +x "{(client folder of current site as string) & "/__appendfile"}"\n'
++ ' 	run "{(client folder of current site as string) & "/__appendfile"}"\n'
++ ' \n'
++ ' else\n'
++ ' 	// Unrecognized OS, not sure how to proceed\n'
++ ' 	continue if {false}\n'
++ ' endif \n';
+
+    BuildXML (strTitle,strDescription,strRelevance,strActionScript); 
+	if (window.getComputedStyle(document.getElementById("btnImportToSite"),null).getPropertyValue('visibility')=="hidden") {
+			ImportToSite();
+		}
+    }
+    
+</script>
+
+<!--
+<style>
+    div#wr_datapage > br + br {
+        display: none;
+    }
+    table {
+        border-collapse: collapse
+    }
+    table, th, td {
+        border: 1px solid black;
+        padding: 5px;
+    }
+</style>
+-->
+
+<div class="bps-container">
+    <div class="bps-logo-background">
+        <div class="bps-logo"></div>
+    </div>
+    <div style="padding: 20px; font-size: 18px; font-family: sans-serif; font-weight: 300;">
+        <div style="">Defunct Sites Cleanup</div>
+        <br>
+        <div style="font-size: 16px;">
+		Last updated: 2020-04-28
+		<p>
+        In some circumstances, Bigfix Clients may be left subscribed to Operator Sites, Custom Sites, or even External Sites that no longer exist in the deployment.  This can be a result of cloning endpoints, BESData corruption, or client masthead switching.<p>
+		The client requests for these sites can cause log error messages on the client or its upstream Relay chain.  In most circumstances a few defunct sites are acceptable, but when a large number accumulates the logged messages can hide real issues.<p>
+		This Dashboard compares the subscribed sites of BigFix clients to the actual sites available in the deployment, and can generate Fixlets to unsubscribe or forcibly remove those sites from clients.<p>
+        As this generated Fixlets contain a list of subscribed sites at the time the Fixlet is generated, this Dashboard could be used to periodically generate a set of updated Fixlets.<p>
+        <p> 
+        Currently, four cases are handled:<br>
+        <ul>
+        <li>Subscribed Operator Sites, where the Operator has been deleted</li>    
+        <li>Subscribed Operator Sites, where the Operator was promoted to a Master Operator and the individual Operator Site should no longer be used</li>
+        <li>Subscribed Custom Sites, where the Custom Site has been deleted from the deployment</li>
+        <li>Subscribed External Sites, where the External Site has been removed from the deployment</li>
+        </ul>
+        <b>This Dashboard should be run as a Master Operator, to ensure the Fixlets consider the full list of available sites in the deployment</b>
+        <div style="border: 1px solid black; padding: 20px;">
+
+<!-- These fields could be un-hidden for debug purposes -->
+<textarea style="visibility:hidden;display:none" name = "Title" id = "Title" rows = "1" cols = "120">Test Title</textarea>
+<textarea style="visibility:hidden;display:none" name = "Description" id = "Description" rows = "1" cols = "120">Test Description</textarea>
+<textarea style="visibility:hidden;display:none" name = "Relevance" id = "Relevance" rows = "1" cols = "120">Test Relevance</textarea>
+<textarea style="visibility:hidden;display:none" name = "ActionScript" id = "ActionScript" rows = "1" cols = "120">Test ActionScript</textarea>
+
+<H2> Press one of the following to generate a Task to cleanup that particular site type:</H2><br>
+<button type="button" onclick='OperatorSites();'>Cleanup Deleted Operator Sites</button><p>
+<button type="button" onclick='PromotedMasterOperatorSites();'>Cleanup Promoted Master Operator Sites</button><p>
+<button type="button" onclick='CustomSites();'>Cleanup Deleted Custom Sites</button><p>
+<button type="button" onclick='ExternalSites();'>Cleanup Removed External Sites</button><p>
+<br>
+
+<!-- These fields could be un-hidden for debug purposes -->
+
+<!-- May set a default site for the new fixlets here --></br>
+<!--<label for = "Site"> Site Name</label>--> <input type="text" id="Site" name="Site" style="visibility:hidden"><br>
+<!-- View a preview of the generated fixlet XML -->
+<label for = "XML" style="visibility:hidden;display:none" align="top" > XML: </label><textarea style="visibility:hidden;display:none" name = "XML" id = "XML" rows = "30" cols = "120"></textarea><br>
+<!-- Display a button to import the Fixlet XML, instead of importing automatically -->
+<button type="button" id="btnImportToSite" style="visibility:hidden" onclick='ImportToSite();'>ImportXMLToSite</button><p>
+
+
+</div>
+        </div>
+    </div>
+</div>
+        ]]></HTML>
+        </Page>
+    </Wizard>
+</BES>
