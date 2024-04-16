@@ -12,18 +12,6 @@
 		<CVENames></CVENames>
 		<SANSID></SANSID>
 		<MIMEField>
-			<Name>x-bfsync-source-actionsite</Name>
-			<Value>http://BES-Dev-Root:52311/cgi-bin/bfgather.exe/actionsite</Value>
-		</MIMEField>
-		<MIMEField>
-			<Name>x-bfsync-source-modification-time</Name>
-			<Value>Tue, 15 Nov 2022 16:17:43 +0000</Value>
-		</MIMEField>
-		<MIMEField>
-			<Name>x-bfsync-source-id</Name>
-			<Value>2854</Value>
-		</MIMEField>
-		<MIMEField>
 			<Name>x-fixlet-modification-time</Name>
 			<Value>Thu, 02 Feb 2023 14:58:26 +0000</Value>
 		</MIMEField>
