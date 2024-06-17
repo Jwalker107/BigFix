@@ -4,7 +4,11 @@ import requests
 # to suppress SSL "untrusted certificate" warnings
 import warnings
 
-myXML = """<?xml version="1.0" encoding="UTF-8"?>
+# make this a raw string so we don't need to escape backslashes.
+# within the actionscript use a CDATA so we don't need to escape the XML
+# 'override' is finicky, no blank lines/spacing is allowed
+# And the action is not allowed to have a trailing blank line
+myXML = r"""<?xml version="1.0" encoding="UTF-8"?>
 <BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
   <SingleAction>
 	<Title>Test</Title>
@@ -15,7 +19,7 @@ override wait
 runas=localuser
 user=Administrator
 password=required
-wait cmd /C "Echo Hello from %USERNAME% > c:\\temp\\hello.txt"]]></ActionScript>
+wait cmd /C "Echo Hello from %USERNAME% > c:\temp\hello.txt"]]></ActionScript>
   <SecureParameter Name="action override password">BES-Dev-1</SecureParameter>
   <!-- must target by ComputerID due to secure parameter -->
 	<Target><ComputerID>539193122</ComputerID></Target>
