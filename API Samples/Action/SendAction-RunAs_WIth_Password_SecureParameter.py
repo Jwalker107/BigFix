@@ -33,8 +33,8 @@ url = "https://bes-root.domain.home:52311/api/actions"
 username = "mo"
 password = "My-Password"
 
-print("POSTing the following XML:")
-print(myXML)
+#print("POSTing the following XML:")
+#print(myXML)
 
 # Suppress InsecureRequestWarning warnings from requests module
 #  These are generated when we do not have a trusted CA certificate on the BES Server
