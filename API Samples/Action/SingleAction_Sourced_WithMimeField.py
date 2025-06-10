@@ -177,8 +177,8 @@ if len(response.json()["result"]) == 0:
     raise ValueError(f"Query returned no results: {query}")
 
 # If we want to send multiple actions, removed this check and loop through the results
-if len(response.json()["result"]) > 1:
-    raise ValueError(f"Query returned multiple results results: {query}")
+# if len(response.json()["result"]) > 1:
+#     raise ValueError(f"Query returned multiple results results: {query}")
 
 for fixlet in response.json()["result"]:
     action_dict["source_fixlet_id"] = fixlet[0]
