@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Fixlet>
+		<Title>Collect Action Info</Title>
+		<Description><![CDATA[&lt;enter a description of the problem and the corrective action here&gt; ]]></Description>
+		<Relevance>true</Relevance>
+		<Category></Category>
+		<Source>Internal</Source>
+		<SourceID></SourceID>
+		<SourceReleaseDate>2023-06-01</SourceReleaseDate>
+		<SourceSeverity></SourceSeverity>
+		<CVENames></CVENames>
+		<SANSID></SANSID>
+		<MIMEField>
+			<Name>custom mime field</Name>
+			<Value>value of custom mime field</Value>
+		</MIMEField>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Fri, 23 Aug 2024 21:00:22 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<DefaultAction ID="Action1">
+			<Description>
+				<PreLink>Click </PreLink>
+				<Link>here</Link>
+				<PostLink> to deploy this action.</PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell"><![CDATA[parameter "ClientFolder"="{pathname of parent folder of parent folder of client folder of site "actionsite"}"
+folder create {parameter "ClientFolder"}/ActionInfo
+parameter "OutFolder"="{pathname of folder "ActionInfo" of folder (parameter "ClientFolder")}"
+
+delete __appendfile
+appendfile Site Context:
+appendfile name: {name of current site}
+appendfile tag: {site tag of current site}
+appendfile {id of action} {now}
+appendfile Action Headers:
+appendfile {concatenation "%0d%0a" of (name of it & " : " & (value of it as string | "")) of headers of action}
+appendfile Action as String:
+appendfile {action as string}
+appendfile Action Properties:
+appendfile id: {id of action }
+appendfile constraint: {constraint of action as string | ""}
+appendfile system constraint: {system constraint of action as string | ""}
+appendfile first active count: {first active count of action as string | ""}
+appendfile active count: {active count of action as string | ""}
+appendfile active line number: {active line number of action as string | ""}
+appendfile last active line number: {last active line number of action as string | ""}
+appendfile origin fixlet id: {origin fixlet id of action as string | ""}
+appendfile constraint: { constrained of action as string | ""}
+appendfile pending: {pending of action as string | ""}
+appendfile waiting for download: {waiting for download of action as string | ""}
+appendfile active: {active of action as string | ""}
+appendfile pending restart: {pending restart of action as string | ""}
+appendfile pending login: {pending login of action as string | ""}
+appendfile group leader: {group leader of action as string | ""}
+appendfile offer: {offer of action as string | "" }
+appendfile offer accepted: {offer accepted of action as string | ""}
+appendfile persistent constraint: {persistent constraint of action as string | ""}
+appendfile pending time: {pending time of action as string | ""}
+appendfile complete time: {complete time of action as string | ""}
+appendfile active start time: { active start time of action as string | ""}
+appendfile last active time: {last active time of action as string | ""}
+appendfile last change time: {last change time of action as string | ""}
+appendfile download failure: {download failure of action as string | ""}
+appendfile exit code: {exit code of action as string | ""}
+appendfile status: {status of action as string | ""}
+
+
+delete "{parameter "OutFolder"}/ActionInfo.txt"
+copy __appendfile "{parameter "OutFolder"}/ActionInfo.txt"
+]]></ActionScript>
+		</DefaultAction>
+	</Fixlet>
+</BES>
