@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Fixlet>
+		<Title>Exclude BES Client Data Folder from Windows Defender On-Access Scanning</Title>
+		<Description><![CDATA[<P>Excludes the default path for the BES Client __BESData folder&nbsp;from Windows Defender On-Access Scanning.&nbsp; Scheduled Scans are not excluded.</P>
+<P><A href="https://learn.microsoft.com/en-us/microsoft-365/security/defender-endpoint/configure-contextual-file-folder-exclusions-microsoft-defender-antivirus?view=o365-worldwide">https://learn.microsoft.com/en-us/microsoft-365/security/defender-endpoint/configure-contextual-file-folder-exclusions-microsoft-defender-antivirus?view=o365-worldwide</A></P>
+<P><A href="https://learn.microsoft.com/en-us/powershell/module/defender/add-mppreference?view=windowsserver2022-ps">https://learn.microsoft.com/en-us/powershell/module/defender/add-mppreference?view=windowsserver2022-ps</A></P>
+<P>&nbsp;</P>]]></Description>
+		<Relevance>windows of operating system and (if exists property "in proxy agent context" then not in proxy agent context else true)</Relevance>
+		<Relevance><![CDATA[not exists values (pathname of data folder of client & "\:{ScanTrigger:OnAccess}") whose (it as integer = 0) of keys "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths" of native registry]]></Relevance>
+		<Category></Category>
+		<Source>Internal</Source>
+		<SourceID></SourceID>
+		<SourceReleaseDate>2023-08-04</SourceReleaseDate>
+		<SourceSeverity></SourceSeverity>
+		<CVENames></CVENames>
+		<SANSID></SANSID>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Fri, 04 Aug 2023 14:47:36 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<DefaultAction ID="Action1">
+			<Description>
+				<PreLink>Click </PreLink>
+				<Link>here</Link>
+				<PostLink> to deploy this action.</PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell">// Exclude yara64.exe from Ms Antimalware On-Access scans
+action uses wow64 redirection false
+waithidden powershell.exe -ExecutionPolicy Bypass Add-MpPreference -ExclusionPath '{pathname of data folder of client}\:{{ScanTrigger:OnAccess}'</ActionScript>
+		</DefaultAction>
+	</Fixlet>
+</BES>
