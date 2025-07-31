@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Analysis>
+		<Title>Client Relay Chain Analysis</Title>
+		<Description>Parses the RelayChain.txt from the client, to retreive several properties of interest.</Description>
+		<Relevance>if exists property "in proxy agent context" then not in proxy agent context else true</Relevance>
+		<Source>Internal</Source>
+		<SourceReleaseDate>2021-03-29</SourceReleaseDate>
+		<MIMEField>
+			<Name>x-bfsync-source-actionsite</Name>
+			<Value>http://BES-Dev-Root:52311/cgi-bin/bfgather.exe/actionsite</Value>
+		</MIMEField>
+		<MIMEField>
+			<Name>x-bfsync-source-modification-time</Name>
+			<Value>Tue, 15 Nov 2022 16:17:08 +0000</Value>
+		</MIMEField>
+		<MIMEField>
+			<Name>x-bfsync-source-id</Name>
+			<Value>386</Value>
+		</MIMEField>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Thu, 31 Jul 2025 19:31:18 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<Property Name="Most Recent Registration Information" ID="1" EvaluationPeriod="PT5M">/* filename/date, time, Success/Failure, Server, Relay Path, Client */  (tuple string item 0 of it, following text of first " " of tuple string item 1 of it, tuple string item 2 of it, tuple string item 3 of it | "none", unique value of concatenation of tuple string items whose (it starts with "r:") of it | "none", tuple string item (number of tuple string items of it - 1) of it ) of (tuple string of (name of it; substrings separated by " - " of lines (maximum of line numbers of lines of it) of it))  of items 0 of (files of it, maximum of modification times of files of it) whose (modification time of item 0 of it = item 1 of it) of folders "RelayChain" of folders "__Global" of data folders of clients</Property>
+		<Property Name="Most Recent Registration Attempt" ID="2" EvaluationPeriod="PT5M"><![CDATA[following text of last "|" of preceding text of last "|" of ("|" & it & "|") of concatenation "|" of (item 0 of it & "::" & item 1 of it) of ( name of it, lines of it) of files of folders "RelayChain" of folders "__Global" of data folders of clients]]></Property>
+		<Property Name="Most Recent Registration Success" ID="3" EvaluationPeriod="PT5M"><![CDATA[(following text of last "|" of preceding text of last " - S - " of it | "NoSuccess", preceding text of first "|" of following text of last " - S - " of it|"NoSuccesses") of ("|" & it & "|") of concatenation "|" of (item 0 of it & "::" & item 1 of it) of ( name of it, lines of it) of files of folders "RelayChain" of folders "__Global" of data folders of clients]]></Property>
+		<Property Name="Most Recent Registration Failure" ID="4" EvaluationPeriod="PT5M"><![CDATA[(following text of last "|" of preceding text of last " - F - " of it | "NoFail", preceding text of first "|" of following text of last " - F - " of it|"NoFailures" ) of ("|" & it & "|") of concatenation "|" of (item 0 of it & "::" & item 1 of it) of ( name of it, lines of it) of files of folders "RelayChain" of folders "__Global" of data folders of clients]]></Property>
+		<Property Name="Most Recent Relay Chain" ID="5" EvaluationPeriod="PT15M"><![CDATA[tuple string of tuple string items whose (it starts with "r:" or it starts with "s:") of tuple string of substrings separated by " - " of following text of last "|||" of ("|||" & it ) of concatenation "|||" of lines containing " - S - " of files of folders "RelayChain" of folders "__Global" of data folders of clients]]></Property>
+		<Property Name="Relay Chain: Direct Parent Relay" ID="6" EvaluationPeriod="PT15M"><![CDATA[tuple string items (number of tuple string items of it - 1) of tuple string of tuple string items whose (it starts with "r:" or it starts with "s:") of tuple string of substrings separated by " - " of following text of last "|||" of ("|||" & it ) of concatenation "|||" of lines containing " - S - " of files of folders "RelayChain" of folders "__Global" of data folders of clients]]></Property>
+		<Property Name="Relay Chain: Ancestor Relays" ID="7" EvaluationPeriod="PT15M"><![CDATA[tuple string items (integers in (0, number of tuple string items of it - 2)) of tuple string of tuple string items whose (it starts with "r:" or it starts with "s:") of tuple string of substrings separated by " - " of following text of last "|||" of ("|||" & it ) of concatenation "|||" of lines containing " - S - " of files of folders "RelayChain" of folders "__Global" of data folders of clients]]></Property>
+	</Analysis>
+</BES>
