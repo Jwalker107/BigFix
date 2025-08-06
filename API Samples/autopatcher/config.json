@@ -1,0 +1,7 @@
+{
+ "bigfix_server":"https://bes-root.local:52311",
+ "bes_username": "api-user",
+ "keyring_system_name":"autopatcher-keyring",
+ "verify": false,   
+ "baselines_site": "custom/Test"
+}
