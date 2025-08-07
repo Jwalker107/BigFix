@@ -1,5 +1,5 @@
 /* 
-Retrieve fixlets for a component group for Windows Service Pack or Servicing Stacks only.
+Retrieve fixlets for a component group for Windows Applications
 Must return the format 
 (
  Fixlet Name, Fixlet Site URL, Fixlet ID, 
@@ -28,11 +28,9 @@ Must return the format
     
     now - last report time of it < 30 * day
     ) of it 
-
-    and (category of it as lowercase = "service pack" or name of it as lowercase contains "servicing stack update for")
     
 ) of all bes sites whose (
     /* fixlet site filters */
-name of it = "Enterprise Security"
-
+   name of it = "Updates for Windows Applications"
+or name of it = "Updates for Windows Applications Extended"
 ) 
