@@ -27,36 +27,8 @@ import time
 import datetime
 
 
-def get_script_path():
-    """Returns the directory of the running script.  Useful for defaulting a configuration file path to match the script itself."""
-    if getattr(sys, "frozen", False):
-        # If the application is run as a bundle (precompiled binary), the PyInstaller bootloader
-        # # extends the sys module by a flag frozen=True and sets the app
-        # # path into variable _MEIPASS'.
-        # print("Using frozen config")
-        return os.path.dirname(os.path.abspath(sys.executable))
-    else:
-        return os.path.dirname(os.path.abspath(__file__))
-
-
-def load_config(config_file):
-    """Load the configuration from a JSON file"""
-    if not os.path.exists(config_file):
-        raise FileNotFoundError(f"Configuration file {config_file} does not exist")
-    with open(config_file, "r") as f:
-        config = json.load(f)
-
-    config["bes_password"] = keyring.get_password(
-        config.get("keyring_system_name"), config.get("bes_username")
-    )
-    if not config.get("bes_password", None):
-        raise ValueError(
-            f"Password for {config['bes_username']} not found in keyring {config.get('keyring_system_name')}; run save_keyring.py set it"
-        )
-    return config
-
-
 def parse_arguments(argv=[]) -> argparse.Namespace:
+    """Parse command-line arguments and return them as a Namespace object."""
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -68,9 +40,9 @@ def parse_arguments(argv=[]) -> argparse.Namespace:
     )
     parser.add_argument(
         "--template",
-        help="Path to file containing baseline template XML. Default is baseline_template.txt in the same directory as this script",
+        help="Path to file containing baseline template XML. Default is baseline_template.xml in the same directory as this script",
         type=str,
-        default=os.path.join(get_script_path(), "baseline_template.txt"),
+        default=os.path.join(get_script_path(), "baseline_template.xml"),
         required=False,
     )
 
@@ -89,7 +61,13 @@ def parse_arguments(argv=[]) -> argparse.Namespace:
         default=False,
         required=False,
     )
-
+    parser.add_argument(
+        "--action-template",
+        help="Path to file containing SourceFixletAction template XML. Default is action_template.xml in the same directory as this script",
+        type=str,
+        default=os.path.join(get_script_path(), "action_template.xml"),
+        required=False,
+    )
     parser.add_argument(
         "--target-computer-query",
         help="Target computers using CustomRelevance query contained in the specified file",
@@ -140,7 +118,37 @@ def parse_arguments(argv=[]) -> argparse.Namespace:
     return args
 
 
-def to_bes_time(
+def get_script_path():
+    """Returns the directory of the running script.  Useful for defaulting a configuration file path to match the script itself."""
+    if getattr(sys, "frozen", False):
+        # If the application is run as a bundle (precompiled binary), the PyInstaller bootloader
+        # # extends the sys module by a flag frozen=True and sets the app
+        # # path into variable _MEIPASS'.
+        # print("Using frozen config")
+        return os.path.dirname(os.path.abspath(sys.executable))
+    else:
+        return os.path.dirname(os.path.abspath(__file__))
+
+
+def load_config(config_file):
+    """Load the configuration from a JSON file"""
+    if not os.path.exists(config_file):
+        raise FileNotFoundError(f"Configuration file {config_file} does not exist")
+    with open(config_file, "r") as f:
+        config = json.load(f)
+
+    # Load the API password from keyring
+    config["bes_password"] = keyring.get_password(
+        config.get("keyring_system_name"), config.get("bes_username")
+    )
+    if not config.get("bes_password", None):
+        raise ValueError(
+            f"Password for {config['bes_username']} not found in keyring {config.get('keyring_system_name')}; run save_keyring.py set it"
+        )
+    return config
+
+
+def bes_time(
     time=datetime.datetime.now(datetime.datetime.now().astimezone().tzinfo),
 ):
     """
@@ -153,7 +161,7 @@ def to_bes_time(
     return time.strftime("%a, %d %b %Y %H:%M:%S %z")
 
 
-def to_bes_date(
+def bes_date(
     date=datetime.datetime.now(datetime.datetime.now().astimezone().tzinfo),
 ):
     """
@@ -163,7 +171,7 @@ def to_bes_date(
     return date.strftime("%Y-%m-%d")
 
 
-def check_login(bigfix_server, session: requests.Session) -> bool:
+def check_login(bigfix_server: str, session: requests.Session) -> bool:
     """Check if the login to the BigFix server is successful"""
     response = session.get(url=f"{bigfix_server}/api/login")
     return response.ok
@@ -197,15 +205,19 @@ def setup_session(*, username=None, password=None, verify=True) -> requests.Sess
     return session
 
 
-def load_baseline_template(template_file: str, **kwargs) -> ElementTree.Element:
-    """Load the baseline template into an Element, substituting some dynamic parameters"""
+def load_xml_template(template_file: str, **kwargs) -> ElementTree.Element:
+    """Load the baseline template into an Element, substituting some dynamic parameters
+    Use of kwargs allows the caller to include their own set of parameters to be substituted into the template.
+    This function provides for {current_date} and {current_time} to be substituted into the template.
+    Any other local variables (including the kwargs) can also be substituted into the template.
+    """
     ## Using kwargs, the caller can include their own set of parameters to be substituted into the template.
     ## current_date and current_time might be substituted into the template
-    current_date = to_bes_date()
-    current_time = to_bes_time()
+    current_date = bes_date()
+    current_time = bes_time()
 
-    baseline_template = read_text_file(template_file).format(**locals())
-    root = ElementTree.fromstring(baseline_template)
+    xml_template = read_text_file(template_file).format(**locals())
+    root = ElementTree.fromstring(xml_template)
     return root
 
 
@@ -247,67 +259,105 @@ def create_baseline_component(
     return component
 
 
+def create_action_target_element(
+    AllComputers: bool = None,
+    ComputerName: str = None,
+    ComputerID: str = None,
+    CustomRelevance: str = None,
+) -> ElementTree.Element:
+    """Creates a Target Element for the SourcedFixletAction XML."""
+
+    target = ElementTree.Element("Target")
+
+    if CustomRelevance:
+        ElementTree.SubElement(target, "CustomRelevance").text = CustomRelevance
+
+    elif ComputerName:
+        if isinstance(ComputerName, list):
+            for item in ComputerName:
+                ElementTree.SubElement(target, "ComputerName").text = item
+        else:
+            ElementTree.SubElement(target, "ComputerName").text = ComputerName
+
+    elif ComputerID:
+        if isinstance(ComputerID, list):
+            for item in ComputerID:
+                ElementTree.SubElement(target, "ComputerID").text = item
+        else:
+            ElementTree.SubElement(target, "ComputerID").text = ComputerID
+
+    elif AllComputers:
+        ElementTree.SubElement(target, "AllComputers").text = "True"
+    else:
+        raise ValueError(
+            "No target computers specified. Use --target-computer-query, --target-computer-names, --target-computer-ids, or --target-allcomputers"
+        )
+
+    return target
+
+
+def get_parent_element(root, target):
+    parent = [element for element in root.iter() if target in element.findall("./")]
+    return parent[0] if parent else None
+
+
+def replace_element(
+    root: ElementTree.Element,
+    old_element: ElementTree.Element,
+    new_element: ElementTree.Element,
+):
+    """Replaces an old element in the XML tree with a new element."""
+    parent = get_parent_element(root, old_element)
+    if parent is None:
+        raise ValueError("The old element has no parent, cannot replace it.")
+    old_element_index = list(parent).index(old_element)
+
+    parent.remove(old_element)
+    parent.insert(old_element_index, new_element)
+
+
 def sourced_fixlet_action_xml(
-    gather_url: str, content_id: str, target_computers: dict
+    action_template: ElementTree.Element,
+    gather_url: str,
+    content_id: str,
+    AllComputers: bool = None,
+    ComputerName: str = None,
+    ComputerID: str = None,
+    CustomRelevance: str = None,
 ) -> ElementTree.Element:
     """Creates an ElementTree XML DOM of a SourcedFixletAction
     content is an Element describing the action to be performed, such as a Baseline or Fixlet.
     target_computers is a dictionary containing at least one of the keys 'ComputerName', 'ComputerID', 'CustomRelevance', or 'AllComputers'.
     """
-    action_template = """<?xml version="1.0" encoding="UTF-8"?>
-<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
-<SourcedFixletAction>
- <SourceFixlet />
- <Target />
- <Settings />
-</SourcedFixletAction>
-</BES>
-"""
-    root = ElementTree.fromstring(action_template)
-    sourcefixlet = root.find("./SourcedFixletAction/SourceFixlet")
+
+    sourcefixlet = action_template.find("./SourcedFixletAction/SourceFixlet")
     ElementTree.SubElement(sourcefixlet, "GatherURL").text = gather_url
     ElementTree.SubElement(sourcefixlet, "FixletID").text = content_id
 
-    target = root.find(".//Target")
-    # Multiple entries of ComputerName or ComputerID are allowed, so we loop through the target_computers dictionary
-    for targettype in ["ComputerName", "ComputerID"]:
-        if target_computers.get(targettype, None) is not None:
-            if isinstance(target_computers[targettype], list):
-                for value in target_computers[targettype]:
-                    ElementTree.SubElement(target, targettype).text = value
+    target = action_template.find(".//Target")
+    new_target = create_action_target_element(
+        AllComputers=AllComputers,
+        ComputerName=ComputerName,
+        ComputerID=ComputerID,
+        CustomRelevance=CustomRelevance,
+    )
 
-            elif isinstance(target_computers[targettype], str):
-                ElementTree.SubElement(target, targettype).text = target_computers[
-                    targettype
-                ]
+    replace_element(action_template, target, new_target)
 
-            else:
-                raise ValueError(
-                    f"Invalid type for target_computers[{targettype}]: {type(target_computers[targettype])}"
-                )
-
-    if target_computers.get("CustomRelevance", None):
-        if isinstance(target_computers["CustomRelevance"], str):
-            ElementTree.SubElement(target, "CustomRelevance").text = target_computers[
-                "CustomRelevance"
-            ]
-
-    if target_computers.get("AllComputers", False):
-        ElementTree.SubElement(target, "AllComputers").text = "True"
-
-    return root
+    return action_template
 
 
 def read_text_file(file_path: str) -> str:
     """Read a text file return it as a string"""
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File {file_path} does not exist")
-
+    if not os.path.isfile(file_path):
+        raise ValueError(f"{file_path} is not a file")
     with open(file_path, "r") as f:
         return f.read()
 
 
-def get_components_queries(filelist: str) -> list:
+def get_components_queries_from_files(filelist: str) -> list[str]:
     """Load multiple queries from a list of files and return them as a list of strings"""
     queries = []
     if not filelist:
@@ -319,13 +369,11 @@ def get_components_queries(filelist: str) -> list:
     return queries
 
 
-def get_fixlet_list(session: requests.Session, query: str) -> list:
+def get_fixlet_list(session: requests.Session, server_url, query: str) -> list:
     """Retrieve a list of Fixlets from the BigFix server based on the provided query.  The properties returned by the query should match the expected fixlet fields."""
     fixlet_query = {"relevance": query, "output": "json"}
 
-    response = session.get(
-        url=f"{config['bigfix_server']}/api/query", params=fixlet_query
-    )
+    response = session.get(url=f"{server_url}/api/query", params=fixlet_query)
     if not response.ok:
         raise ValueError(
             f"Fixlet Query failed, code:{response.status_code}, message:{response.text} "
@@ -334,6 +382,77 @@ def get_fixlet_list(session: requests.Session, query: str) -> list:
         raise ValueError(f'Fixlet Query gave an error: {response.json()["error"]} ')
     fixlet_list = response.json()["result"]
     return fixlet_list
+
+
+def add_components_to_group(
+    baseline_component_group: ElementTree.Element,
+    session: requests.Session,
+    server_url: str,
+    component_query: str,
+) -> None:
+    """Executes a Session Relevance query to retrieve a list of Fixlets and adds them to the provided BaselineComponentGroup ElementTree.Element."""
+
+    fixlet_list = get_fixlet_list(session, server_url, component_query)
+    print(f"Adding {len(fixlet_list)} fixlets to the BaselineComponentGroup")
+
+    baseline_component_group.attrib["Name"] = "Components Group"
+
+    # Loop through the fixlets retrieved by the query, and create a BaselineComponent for each.
+    for fixlet in fixlet_list:
+        component = create_baseline_component(
+            name=fixlet[0],
+            source_site_url=fixlet[1],
+            source_id=fixlet[2],
+            action_name=fixlet[3],
+            action_script=fixlet[4],
+            relevance=fixlet[5],
+            success_criteria=fixlet[6],
+            script_type=fixlet[7],
+            include_in_relevance=("true" if fixlet[8] == "Fixlet" else "false"),
+        )
+        baseline_component_group.append(component)
+
+
+def add_baseline_component_groups(
+    *,
+    session: requests.Session,
+    server_url: str,
+    baseline: ElementTree.Element,
+    query_list: list[str],
+) -> ElementTree.Element:
+    """Appends BaselineComponentGroups to the provided baseline ElementTree.Element
+    based on the provided component queries.
+    Each query should return a list of fixlet fields in the proper order"""
+
+    # Retrieve the list of queries we are going to run by looping through the provided query files
+
+    baseline_component_collection = baseline.find(
+        "Baseline/BaselineComponentCollection"
+    )
+
+    # for each query in the component_queries list, create a BaselineComponentGroup populated by the Fixlets/Tasks returned by the query
+    for query in query_list:
+        baseline_component_group = ElementTree.SubElement(
+            baseline_component_collection, "BaselineComponentGroup"
+        )
+        add_components_to_group(baseline_component_group, session, server_url, query)
+
+    return baseline
+
+
+def get_site_gather_url(session, url) -> str:
+    """Retrieve the GatherURL of the specified site from the BigFix server."""
+    ### This is necessary because the GatherURL may not be the same as the site URL we are using.
+    ### for instance we might be using the IP address or an alias of the root server to connect to REST, but the GatherURL must match the actual site URL.
+
+    response = session.get(url)
+    if not response.ok:
+        raise ValueError(
+            f"Failed to retrieve site {url} , code:{response.status_code}, message:{response.text} "
+        )
+    site_xml = ElementTree.fromstring(response.content)
+    gather_url = site_xml.find(".//GatherURL").text
+    return gather_url
 
 
 def main(argv):
@@ -350,42 +469,18 @@ def main(argv):
         raise ValueError(f"Login failed, unable to continue")
 
     start_time = time.time()
-    # create the template action XML content
-    baseline = load_baseline_template(args.template)
-    # Retrieve the list of queries we are going to run by looping through the provided query files
-    components_definitions = get_components_queries(args.query)
+    query_list = [read_text_file(query_file) for query_file in args.query]
 
-    baseline_component_collection = baseline.find(
-        "Baseline/BaselineComponentCollection"
+    baseline = load_xml_template(args.template)
+
+    # The functions runs all the fixlet queries and adds the results to the baseline
+    add_baseline_component_groups(
+        session=session,
+        server_url=config["bigfix_server"],
+        baseline=baseline,
+        query_list=query_list,
     )
-
-    for components_query in components_definitions:
-        fixlet_list = get_fixlet_list(session, components_query)
-        print(
-            f"Adding BaselineComponentGroup with {len(fixlet_list)} fixlets to the Baseline"
-        )
-
-        baseline_component_group = ElementTree.SubElement(
-            baseline_component_collection, "BaselineComponentGroup"
-        )
-        baseline_component_group.attrib["Name"] = "Components Group"
-
-        # Loop through the fixlets retrieved by the query, and create a BaselineComponent for each.
-        for fixlet in fixlet_list:
-            component = create_baseline_component(
-                name=fixlet[0],
-                source_site_url=fixlet[1],
-                source_id=fixlet[2],
-                action_name=fixlet[3],
-                action_script=fixlet[4],
-                relevance=fixlet[5],
-                success_criteria=fixlet[6],
-                script_type=fixlet[7],
-                include_in_relevance=("true" if fixlet[8] == "Fixlet" else "false"),
-            )
-
-            baseline_component_group.append(component)
-
+    # If we are in preview mode, print the baseline XML and exit without posting
     if args.preview:
         # Print preview and exit without posting
         print(ElementTree.tostring(baseline, encoding="unicode"))
@@ -403,11 +498,9 @@ def main(argv):
     )
 
     if response.ok:
-        print(f"Baseline creation succeeded with {response.status_code}")
-        besapi_response = ElementTree.fromstring(response.text)
-        # Extract the Baseline ID from the response
-        baseline_id = besapi_response.find("./Baseline/ID").text
-        print(f"Baseline ID is {baseline_id}")
+        baseline_response = ElementTree.fromstring(response.text)
+        baseline_id = baseline_response.find("./Baseline/ID").text
+        print(f"Successfully posted baseline ID {baseline_id}")
     else:
         raise ValueError(
             f"Baseline creation failed with {response.status_code}, message {response.text}, unable to continue"
@@ -415,35 +508,26 @@ def main(argv):
 
     if args.action or args.preview_action:
         print("Generating Action XML for the Baseline")
-        # Determine GatherURL of the Baseline site
-        response = session.get(
-            f"{config['bigfix_server']}/api/site/{config['baselines_site']}"
+        action = load_xml_template(args.action_template)
+        baseline_gather_url = get_site_gather_url(
+            session, f"{config['bigfix_server']}/api/site/{config['baselines_site']}"
         )
-        if not response.ok:
-            raise ValueError(
-                f"Failed to retrieve site {config['bigfix_server']}/api/site/{config['baselines_site']} , code:{response.status_code}, message:{response.text} "
-            )
-        site_xml = ElementTree.fromstring(response.content)
-        gather_url = site_xml.find(".//GatherURL").text
 
-        if args.target_computer_query:
-            target_computers = {
-                "CustomRelevance": read_text_file(args.target_computer_query)
-            }
-        elif args.target_computer_names:
-            target_computers = {"ComputerName": args.target_computer_names}
-        elif args.target_computer_ids:
-            target_computers = {"ComputerID": args.target_computer_ids}
-        elif args.target_allcomputers:
-            target_computers = {"AllComputers": True}
-        else:
-            raise ValueError(
-                "No target computers specified. Use --target-computer-query, --target-computer-names, --target-computer-ids, or --target-allcomputers"
-            )
+        target_parameters = {
+            "CustomRelevance": (
+                read_text_file(args.target_computer_query)
+                if args.target_computer_query
+                else None
+            ),
+            "ComputerName": args.target_computer_names,
+            "ComputerID": args.target_computer_ids,
+            "AllComputers": args.target_allcomputers,
+        }
 
         action_request = sourced_fixlet_action_xml(
-            gather_url, baseline_id, target_computers
+            action, baseline_gather_url, baseline_id, **target_parameters
         )
+
         if args.preview_action:
             # Print preview of the Action XML and exit without posting
             print(ElementTree.tostring(action_request, encoding="unicode"))

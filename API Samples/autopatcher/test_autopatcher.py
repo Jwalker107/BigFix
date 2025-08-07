@@ -20,7 +20,7 @@ def main():
     """Main function to run the autopatcher script."""
     ### Each potential command-line argument is listed below.  Set the 'if True:' condition to True to run that command.
 
-    if True:
+    if False:
         # Generate a baseline preview only
         autopatcher.main(
             [
@@ -30,7 +30,7 @@ def main():
             ]
         )
 
-    if True:
+    if False:
         # Create a baseline and create an action preview only targeting by CustomRelevance
         autopatcher.main(
             [
@@ -39,6 +39,55 @@ def main():
                 "--preview-action",
                 "--target-computer-query",
                 os.path.join(get_script_path(), "computers_query.txt"),
+            ]
+        )
+
+    if False:
+        # Create a baseline and create an action preview only targeting by CustomRelevance
+        autopatcher.main(
+            [
+                "--query",
+                os.path.join(get_script_path(), "componentgroup1.txt"),
+                "--preview-action",
+                "--target-computer-query",
+                os.path.join(get_script_path(), "computers_query.txt"),
+            ]
+        )
+    if False:
+        # Create a baseline and create an action preview only targeting by ComputerName
+        autopatcher.main(
+            [
+                "--query",
+                os.path.join(get_script_path(), "componentgroup1.txt"),
+                "--preview-action",
+                "--target-computer-names",
+                "Computer1",
+                "Computer2",
+                "Computer3",
+            ]
+        )
+
+    if False:
+        # Create a baseline and create an action preview only targeting by ComputerID
+        autopatcher.main(
+            [
+                "--query",
+                os.path.join(get_script_path(), "componentgroup1.txt"),
+                "--preview-action",
+                "--target-computer-ids",
+                "1080035267",
+            ]
+        )
+
+    if True:
+        # Create a baseline and create an action targeting by ComputerID
+        autopatcher.main(
+            [
+                "--query",
+                os.path.join(get_script_path(), "componentgroup1.txt"),
+                "--preview-action",
+                "--target-computer-ids",
+                "1080035267",
             ]
         )
 
