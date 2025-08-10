@@ -64,10 +64,11 @@ To perform the example execution, after updating the configuration files describ
 ### Generate a Baseline Preview without saving anything to the server
 ```
 python autopatcher.py --query componentgroup1.txt --query componentgroup2.txt --query componentgroup3.txt --preview
+```
 
-# Create a Baseline and save it on the server in the site defined in the config.json
-(temp-venv) C:\BigFix\API Samples\autopatcher>  python autopatcher.py --query componentgroup1.txt --query componentgroup2.txt --query componentgroup3.txt
-
+### Create a Baseline and save it on the server in the site defined in the config.json
+```
+python autopatcher.py --query componentgroup1.txt --query componentgroup2.txt --query componentgroup3.txt
 
 Adding 0 fixlets to the BaselineComponentGroup
 Adding 13 fixlets to the BaselineComponentGroup
@@ -79,7 +80,7 @@ Execution Time:  6.64
 
 ### Create a Baseline, save it on the server, and generate a Preview of an Action (without submitting the action).  The action would be targeted to computers matching the query in 'computers_query.txt' 
 ```
-(temp-venv) C:\BigFix\API Samples\autopatcher>  python autopatcher.py --query componentgroup1.txt --query componentgroup2.txt --query componentgroup3.txt --preview-action --target-computer-query computers_query.txt
+python autopatcher.py --query componentgroup1.txt --query componentgroup2.txt --query componentgroup3.txt --preview-action --target-computer-query computers_query.txt
 
 Adding 0 fixlets to the BaselineComponentGroup
 Adding 13 fixlets to the BaselineComponentGroup
@@ -102,7 +103,7 @@ Preview mode, skipping action POST
 ### Create a Baseline, save it on the server, and take an Action from the baseline.  The action would be targeted to computers matching the query in 'computers_query.txt' 
 
 ```
-(temp-venv) C:\BigFix\API Samples\autopatcher>  python autopatcher.py --query componentgroup1.txt --query componentgroup2.txt --query componentgroup3.txt --action --target-computer-query computers_query.txt
+ python autopatcher.py --query componentgroup1.txt --query componentgroup2.txt --query componentgroup3.txt --action --target-computer-query computers_query.txt
 
 Adding 0 fixlets to the BaselineComponentGroup
 Adding 13 fixlets to the BaselineComponentGroup
