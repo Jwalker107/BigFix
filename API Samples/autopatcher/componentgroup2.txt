@@ -1,0 +1,37 @@
+/* 
+Retrieve fixlets for a component group for Windows, excluding Service Packs and Servicing Stack Updates
+Must return the format 
+(
+ Fixlet Name, Fixlet Site URL, Fixlet ID, 
+ Fixlet Action ID, Fixlet Action Script,  Fixlet Relevance, 
+ Action Success Criteria, Fixlet Type
+ ) 
+*/
+
+(
+    name of it
+    , url of site of it
+    , id of it
+    , content id of (default action of it | action 0 of it)
+    , script of (default action of it | action 0 of it)
+    , relevance of it
+    , (if (success on run to completion of (default action of it | action 0 of it)) then "RunToCompletion" else "OriginalRelevance") of it
+    , script type of (default action of it | action 0 of it)
+    , type of it
+) of fixlets whose (
+        /* fixlet filters */
+    fixlet flag of it
+    and exists default action of it
+
+        /* applicable computer filters */
+    and exists applicable computers whose (
+    
+    now - last report time of it < 30 * day
+    ) of it 
+    and source severity of it as lowercase is contained by set of ("critical";"important")
+    and not (category of it as lowercase = "service pack" or name of it as lowercase contains "servicing stack update for")
+) of all bes sites whose (
+    /* fixlet site filters */
+name of it = "Enterprise Security"
+
+) 

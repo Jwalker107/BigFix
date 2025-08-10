@@ -1,0 +1,5 @@
+/* 
+Relevance query for targeting computers.  Must return True or False when evaluated by the computers.
+*/
+
+computer name as lowercase starts with "test"
