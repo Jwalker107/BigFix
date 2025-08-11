@@ -2,6 +2,7 @@
 This script demonstrates Creating, and optionally Actioning, a Baseline using custom selection criteria for the Fixlet content.
 
 # Initial Setup
+## Python Setup
 Install Python 3.10 or higher.
 
 Preferably, setup a Python Virtual Environment as described at https://docs.python.org/3/library/venv.html to isolate Python libraries and configuration.
@@ -10,10 +11,25 @@ In a command shell, switch to the directory containing this script and install a
 ```
 pip install -r requirements.txt
 ```
+## Configuration File
+In the script directory, update `config.json` for your environment; or copy it to another name and specify the path using the `--config` option when you run the autopatcher script.
+Example content:
+```
+{
+ "bigfix_server":"https://bes-root.local:52311",
+ "bes_username": "api-user",
+ "keyring_system_name":"autopatcher-keyring",
+ "verify": false,   
+ "baselines_site": "custom/Test"
+}
+```
+`"bigfix_server"`: URL, including port number, to your BigFix Root Server REST API port.
+`"bes_username"` : The user name that should be used to connect to the REST API on your BigFix Server.  At present time, LDAP accounts are supported but SAML authentication is not.
+`"keyring_system_name"`: A name that you can create to store the password for the API account in your system using the 'keyring' module.  This allows you to store different passwords with different system names.  This can be any name you designate, and is the name under which the password will be stored in Windows Credential Manager.
+`"verify"`: Whether the script should verify the HTTPS certificate of your BigFix REST API.  Generally set to 'true' if you are using custom REST certificates that are trusted by your client system, or 'false' if you are using the default self-signed certificates for BigFix REST API.
+`"baselines_site"': The site, relative to "/api/sites", in which you want newly-generated Baselines to be stored.  Options include `custom/CustomSiteName`, `operator/UserName`, or `/master` (please don't use `/master` ! ).
 
-# Usage
-
-## Template Files
+## Patch Query Template Files
 Update the template files, or create new ones, as needed.
 `baseline_template.xml` is the default XML template used when creating Baselines.
 `action_template.xml` is the default XML template used when creating an Action from the new Baseline.
@@ -33,13 +49,10 @@ Fixlet Action ID, Fixlet Action Script,  Fixlet Relevance,
 Action Success Criteria, Fixlet Type
 ```
 
-`computers_query.txt` contains an example query for targeting computers when creating an Action.  query should return True or False when evaluated on client computers.  The example query is used to target only computers containing 'test' in their computer name.
+## Computer Targeting Template Files
+`computers_query.txt` contains an example query for targeting computers when creating an Action.  query should return True or False when evaluated on client computers.  The example query is used to target only computers containing 'test' in their computer name.  
 
-
-## Connection Configuration
-Update the reference `config.json` file.  This file contains the URL to your BigFix server, the username to use when connecting to it, the system name to be used when storing your password into the system keyring, the Site in which the generated baselines should be saved, and whether to verify the Certificate presented by the root server when you connect to it.
-
-## Saving Password
+## Saving Password to Keyring
 The script uses Python's 'keyring' module to store credentials into the system-provided keyring.  On Windows, this is the Windows Credential Store.  On Mac and Linux, several options are tried in a priority order to use the best available (but generally, is only usable with a graphical login).  For details see https://pypi.org/project/keyring/
 
 For our purposes, what is important to know is that we need to execute the `save_keyring.py` script at least once, to store a password for the account matching the `keyring_system_name` and `bes_username` values specified in the config.json.  For instance, with the defaults of
@@ -56,7 +69,7 @@ Enter password for the keyring:
 Confirm password:
 Credential saved to keyring.
 ```
-
+# Usage
 ## Running Autopatcher
 
 To perform the example execution, after updating the configuration files described above, we may execute the autopatcher script from a command prompt.
