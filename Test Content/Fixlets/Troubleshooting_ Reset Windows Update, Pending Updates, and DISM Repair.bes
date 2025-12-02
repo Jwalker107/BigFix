@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Task>
+		<Title>Troubleshooting: Reset Windows Update, Pending Updates, and DISM Repair</Title>
+		<Description><![CDATA[<P><STRONG>USE WITH CAUTION</STRONG></P>
+<P class=MsoNormal style="MARGIN: 0in 0in 0pt">&nbsp;</P>
+<P class=MsoNormal style="MARGIN: 0in 0in 0pt">This Task performs several cleanup operations to attempt to resolve failing Windows Updates.&nbsp; This should be used with care, and only on systems that are failing to install updates after all other troubleshooting steps have been taken, consider this a last effort before reimaging the problem machine.&nbsp; Making system changes, especially to an already-broken system, may further corrupt the system.&nbsp; Backup any important data before running this task!</P>
+<P class=MsoNormal style="MARGIN: 0in 0in 0pt">&nbsp;</P>
+<P class=MsoNormal style="MARGIN: 0in 0in 0pt">This Task</P>
+<UL>
+<LI>
+<DIV class=MsoNormal style="MARGIN: 0in 0in 0pt">Attempts to clear cached Windows Update data to resolve cases where Windows Updates fail to install due to a corruption of the SoftwareDistribution folder.</DIV>
+<UL>
+<LI>
+<DIV class=MsoNormal style="MARGIN: 0in 0in 0pt">Performs&nbsp;the steps described at the following article, including steps that are associated with corrupt Windows Update components.</DIV>
+<LI>
+<DIV class=MsoNormal style="MARGIN: 0in 0in 0pt"><A href="https://support.microsoft.com/en-us/help/971058/how-do-i-reset-windows-update-components"><FONT color=#0000ff size=3 face="Times New Roman">https://support.microsoft.com/en-us/help/971058/how-do-i-reset-windows-update-components</FONT></A></DIV>
+<LI>
+<DIV class=MsoNormal style="MARGIN: 0in 0in 0pt">Logs Generated:</DIV>
+<UL>
+<LI>
+<DIV class=MsoNormal style="MARGIN: 0in 0in 0pt">\Windows\Temp\windows-update-cleanup.txt</DIV></LI></UL></LI></UL></LI></UL>
+<P class=MsoNormal style="MARGIN: 0in 0in 0pt">&nbsp;</P>
+<UL>
+<LI>
+<DIV class=MsoNormal style="MARGIN: 0in 0in 0pt">Attempts to remove any Pending component installations</DIV>
+<UL>
+<LI>
+<P class=MsoNormal style="MARGIN: 0in 0in 0pt">Logs Generated:</P>
+<DIV class=MsoNormal style="MARGIN: 0in 0in 0pt">
+<UL>
+<LI>\Windows\Temp\DISM-RemovePending.log </LI></UL></DIV>
+<P>&nbsp;</P></LI></UL>
+<LI>
+<P>Attempts Windows Component Store Cleanup</P>
+<UL>
+<LI>
+<P>DISM.EXE /Online /Cleanup-Image /RestoreHealth /Quiet /NoReboot</P>
+<LI>
+<P><A href="https://docs.microsoft.com/en-us/troubleshoot/windows-server/deployment/fix-windows-update-errors"><FONT color=#0066cc>https://docs.microsoft.com/en-us/troubleshoot/windows-server/deployment/fix-windows-update-errors</FONT></A></P>
+<LI>
+<P>Logs Generated:</P>
+<UL>
+<LI>\Windows\Temp\DISM-RestoreHealth.out 
+<LI>\Windows\Temp\DISM-RestoreHealth.log</LI></UL></LI></UL></LI></UL>
+<P>The Second action allows specifying a path to a trusted set of Windows installation files to be used to perform a repair, if original Windows installation files are required, for example 'C:\Windows-Media-Source'.&nbsp; The path should be accessible to the LocalSystem WIndows account (network UNC shares are generally not accessible and the media should be copied to a client path before running the action).</P>
+<P>&nbsp;&nbsp;</P>]]></Description>
+		<Relevance>windows of operating system AND (if exists property "in proxy agent context" then not in proxy agent context else true)</Relevance>
+		<Relevance><![CDATA[version of operating system >= version "6.2"]]></Relevance>
+		<Category></Category>
+		<Source>Internal</Source>
+		<SourceID></SourceID>
+		<SourceReleaseDate>2023-10-04</SourceReleaseDate>
+		<SourceSeverity></SourceSeverity>
+		<CVENames></CVENames>
+		<SANSID></SANSID>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Tue, 14 May 2024 17:10:54 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<DefaultAction ID="Action1">
+			<Description>
+				<PreLink>Click </PreLink>
+				<Link>here</Link>
+				<PostLink> to attempt repair without specifying an Installation Source.</PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell"><![CDATA[action uses wow64 redirection {not x64 of operating system}
+
+parameter "LogFolder"="{pathname of windows folder}\temp"
+folder create "{parameter "LogFolder"}"
+
+// Windows Update Store Cleanup & Windows Update Components Reset
+delete __createfile
+createfile until _EOF_EOF_EOF
+
+taskkill /im wusa.exe /f
+net stop bits
+net stop wuauserv
+net stop cryptsvc  
+
+_EOF_EOF_EOF
+delete precleanup.cmd
+move __createfile precleanup.cmd
+waithidden cmd.exe /c precleanup.cmd
+
+
+// Check that everything *actually* stopped.  Disable service and kill processes if necessary
+
+if {exists pids of services "wuauserv"}
+ waithidden sc.exe config wuauserv start= disabled
+ waithidden taskkill.exe /pid {pids of services "wuauserv"} /F
+endif
+
+if {exists pids of services "bits"}
+ waithidden sc.exe config bits start= disabled
+ waithidden taskkill.exe /pid {pids of services "bits"} /F
+endif
+
+if {exists pids of services "cryptsvc"}
+ waithidden sc.exe config cryptsvc start= disabled
+ waithidden taskkill.exe /pid {pids of services "cryptsvc"} /F
+endif
+
+delete __createfile
+createfile until _EOF_EOF_EOF
+
+Del /q "%ALLUSERSPROFILE%\Application Data\Microsoft\Network\Downloader\qmgr*.dat"
+
+rd /s /q %Systemroot%\SoftwareDistribution\DataStore.bak
+rd /s /q %Systemroot%\SoftwareDistribution\Download.bak
+rd /s /q %Systemroot%\system32\catroot2.bak
+
+Ren %Systemroot%\SoftwareDistribution\DataStore DataStore.bak
+Ren %Systemroot%\SoftwareDistribution\Download Download.bak
+Ren %Systemroot%\System32\catroot2 catroot2.bak
+
+sc.exe sdset bits D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;AU)(A;;CCLCSWRPWPDTLOCRRC;;;PU)
+sc.exe sdset wuauserv D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;AU)(A;;CCLCSWRPWPDTLOCRRC;;;PU)
+
+
+cd /d %windir%\system32
+regsvr32.exe /s atl.dll
+regsvr32.exe /s urlmon.dll
+regsvr32.exe /s mshtml.dll
+regsvr32.exe /s shdocvw.dll
+regsvr32.exe /s browseui.dll
+regsvr32.exe /s jscript.dll
+regsvr32.exe /s vbscript.dll
+regsvr32.exe /s scrrun.dll
+regsvr32.exe /s msxml.dll
+regsvr32.exe /s msxml3.dll
+regsvr32.exe /s msxml6.dll
+regsvr32.exe /s actxprxy.dll
+regsvr32.exe /s softpub.dll
+regsvr32.exe /s wintrust.dll
+regsvr32.exe /s dssenh.dll
+regsvr32.exe /s rsaenh.dll
+regsvr32.exe /s gpkcsp.dll
+regsvr32.exe /s sccbase.dll
+regsvr32.exe /s slbcsp.dll
+regsvr32.exe /s cryptdlg.dll
+regsvr32.exe /s oleaut32.dll
+regsvr32.exe /s ole32.dll
+regsvr32.exe /s shell32.dll
+regsvr32.exe /s initpki.dll
+regsvr32.exe /s wuapi.dll
+regsvr32.exe /s wuaueng.dll
+regsvr32.exe /s wuaueng1.dll
+regsvr32.exe /s wucltui.dll
+regsvr32.exe /s wups.dll
+regsvr32.exe /s wups2.dll
+regsvr32.exe /s wuweb.dll
+regsvr32.exe /s qmgr.dll
+regsvr32.exe /s qmgrprxy.dll
+regsvr32.exe /s wucltux.dll
+regsvr32.exe /s muweb.dll
+regsvr32.exe /s wuwebv.dll
+
+sc config bits start= demand
+net start bits
+
+sc config wuauserv start= demand
+net start wuauserv   
+
+sc config cryptsvc start= auto
+net start cryptsvc 
+_EOF_EOF_EOF
+
+delete cleanup.cmd
+move __createfile cleanup.cmd
+
+waithidden cmd.exe /c "cleanup.cmd > "{parameter "LogFolder"}\windows-update-cleanup.txt" 2>&1"
+
+// DISM Pending Component Updates Reset
+delete __createfile
+createfile until EOF_EOF_EOF
+@echo DISM repair running %DATE% %TIME%
+
+@echo Kill any running WUSA update
+taskkill.exe /im wusa.exe /f
+
+@echo Package list before servicing:
+dism /online /get-packages /format:table
+
+@echo Removing any Pending Package installations via DISM
+for /f %%i in ('dism /online /get-packages /format:table ^|findstr " Pending ^|"') do dism.exe /online /remove-package /PackageName:%%i /NoRestart
+@echo DISM command ended with result code %ERRORLEVEL%
+
+@echo Package list after servicing:
+dism /online /get-packages /format:table
+
+
+
+@echo DISM repair completed %DATE% %TIME%
+
+EOF_EOF_EOF
+
+delete DISM-repair.cmd
+move __createfile DISM-repair.cmd
+
+delete "{parameter "LogFolder"}\DISM-RemovePending.log"
+waithidden cmd.exe /c "DISM-repair.cmd >> "{parameter "LogFolder"}\DISM-RemovePending.log" 2>&1"
+
+
+
+delete "{parameter "LogFolder"}\DISM-RestoreHealth.log"
+delete "{parameter "LogFolder"}\DISM-RestoreHealth.out"
+
+waithidden cmd /C "DISM.EXE /LogPath:"{parameter "LogFolder"}\DISM-RestoreHealth.log" /LogLevel:4 /NoRestart /Online /Cleanup-Image /RestoreHealth > "{parameter "LogFolder"}\DISM-RestoreHealth.out" 2>&1"
+
+
+action requires restart "windows_update_reset"
+
+]]></ActionScript>
+		</DefaultAction>
+		<Action ID="Action2">
+			<Description>
+				<PreLink>Click </PreLink>
+				<Link>here</Link>
+				<PostLink> to attempt repair with a specific Windows Installation Source.</PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell"><![CDATA[action uses wow64 redirection {not x64 of operating system}
+
+action parameter query "RepairSource" with description "Enter the path of trusted Windows files to be used for repair" and with default value "C:\Windows-Media-Source"
+
+parameter "LogFolder"="{pathname of windows folder}\temp"
+folder create "{parameter "LogFolder"}"
+
+// Windows Update Store Cleanup & Windows Update Components Reset
+delete __createfile
+createfile until _EOF_EOF_EOF
+
+taskkill /im wusa.exe /f
+net stop bits
+net stop wuauserv
+net stop cryptsvc  
+
+_EOF_EOF_EOF
+delete precleanup.cmd
+move __createfile precleanup.cmd
+waithidden cmd.exe /c precleanup.cmd
+
+
+// Check that everything *actually* stopped.  Disable service and kill processes if necessary
+
+if {exists pids of services "wuauserv"}
+ waithidden sc.exe config wuauserv start= disabled
+ waithidden taskkill.exe /pid {pids of services "wuauserv"} /F
+endif
+
+if {exists pids of services "bits"}
+ waithidden sc.exe config bits start= disabled
+ waithidden taskkill.exe /pid {pids of services "bits"} /F
+endif
+
+if {exists pids of services "cryptsvc"}
+ waithidden sc.exe config cryptsvc start= disabled
+ waithidden taskkill.exe /pid {pids of services "cryptsvc"} /F
+endif
+
+delete __createfile
+createfile until _EOF_EOF_EOF
+
+Del /q "%ALLUSERSPROFILE%\Application Data\Microsoft\Network\Downloader\qmgr*.dat"
+
+rd /s /q %Systemroot%\SoftwareDistribution\DataStore.bak
+rd /s /q %Systemroot%\SoftwareDistribution\Download.bak
+rd /s /q %Systemroot%\system32\catroot2.bak
+
+Ren %Systemroot%\SoftwareDistribution\DataStore DataStore.bak
+Ren %Systemroot%\SoftwareDistribution\Download Download.bak
+Ren %Systemroot%\System32\catroot2 catroot2.bak
+
+sc.exe sdset bits D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;AU)(A;;CCLCSWRPWPDTLOCRRC;;;PU)
+sc.exe sdset wuauserv D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;AU)(A;;CCLCSWRPWPDTLOCRRC;;;PU)
+
+
+cd /d %windir%\system32
+regsvr32.exe /s atl.dll
+regsvr32.exe /s urlmon.dll
+regsvr32.exe /s mshtml.dll
+regsvr32.exe /s shdocvw.dll
+regsvr32.exe /s browseui.dll
+regsvr32.exe /s jscript.dll
+regsvr32.exe /s vbscript.dll
+regsvr32.exe /s scrrun.dll
+regsvr32.exe /s msxml.dll
+regsvr32.exe /s msxml3.dll
+regsvr32.exe /s msxml6.dll
+regsvr32.exe /s actxprxy.dll
+regsvr32.exe /s softpub.dll
+regsvr32.exe /s wintrust.dll
+regsvr32.exe /s dssenh.dll
+regsvr32.exe /s rsaenh.dll
+regsvr32.exe /s gpkcsp.dll
+regsvr32.exe /s sccbase.dll
+regsvr32.exe /s slbcsp.dll
+regsvr32.exe /s cryptdlg.dll
+regsvr32.exe /s oleaut32.dll
+regsvr32.exe /s ole32.dll
+regsvr32.exe /s shell32.dll
+regsvr32.exe /s initpki.dll
+regsvr32.exe /s wuapi.dll
+regsvr32.exe /s wuaueng.dll
+regsvr32.exe /s wuaueng1.dll
+regsvr32.exe /s wucltui.dll
+regsvr32.exe /s wups.dll
+regsvr32.exe /s wups2.dll
+regsvr32.exe /s wuweb.dll
+regsvr32.exe /s qmgr.dll
+regsvr32.exe /s qmgrprxy.dll
+regsvr32.exe /s wucltux.dll
+regsvr32.exe /s muweb.dll
+regsvr32.exe /s wuwebv.dll
+
+sc config bits start= demand
+net start bits
+
+sc config wuauserv start= demand
+net start wuauserv   
+
+sc config cryptsvc start= auto
+net start cryptsvc 
+_EOF_EOF_EOF
+
+delete cleanup.cmd
+move __createfile cleanup.cmd
+
+waithidden cmd.exe /c "cleanup.cmd > "{parameter "LogFolder"}\windows-update-cleanup.txt" 2>&1"
+
+// DISM Pending Component Updates Reset
+delete __createfile
+createfile until EOF_EOF_EOF
+@echo DISM repair running %DATE% %TIME%
+
+@echo Kill any running WUSA update
+taskkill.exe /im wusa.exe /f
+
+@echo Package list before servicing:
+dism /online /get-packages /format:table
+
+@echo Removing any Pending Package installations via DISM
+for /f %%i in ('dism /online /get-packages /format:table ^|findstr " Pending ^|"') do dism.exe /online /remove-package /PackageName:%%i /NoRestart
+@echo DISM command ended with result code %ERRORLEVEL%
+
+@echo Package list after servicing:
+dism /online /get-packages /format:table
+
+
+
+@echo DISM repair completed %DATE% %TIME%
+
+EOF_EOF_EOF
+
+delete DISM-repair.cmd
+move __createfile DISM-repair.cmd
+
+delete "{parameter "LogFolder"}\DISM-RemovePending.log"
+waithidden cmd.exe /c "DISM-repair.cmd >> "{parameter "LogFolder"}\DISM-RemovePending.log" 2>&1"
+
+
+
+delete "{parameter "LogFolder"}\DISM-RestoreHealth.log"
+delete "{parameter "LogFolder"}\DISM-RestoreHealth.out"
+
+waithidden cmd /C "DISM.EXE /LogPath:"{parameter "LogFolder"}\DISM-RestoreHealth.log" /LogLevel:4 /NoRestart /Online /Cleanup-Image /RestoreHealth /Source:"{parameter "RepairSource" of action}" /LimitAccess > "{parameter "LogFolder"}\DISM-RestoreHealth.out" 2>&1"
+
+action requires restart "windows_update_reset"
+
+]]></ActionScript>
+		</Action>
+	</Task>
+</BES>
