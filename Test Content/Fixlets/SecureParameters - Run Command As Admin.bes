@@ -18,15 +18,16 @@ cmd.exe /c "echo Hello World from %USERNAME% > %WINDIR%\message.txt 2>&1"
 <TR>
 <TH></TH>
 <TR>
-<TD>username</TD>
-<TD><INPUT id=username name=username required="true"></TD></TR>
+  <TD>username</TD>
+  <TD><INPUT id=username name=username required="true"></TD>
+</TR>
 <TR>
-<TD>Command Line to run (including cmd.exe /c if needed)</TD>
-<TD><INPUT id=commandline name=commandline size=80></TD></TR>
+  <TD>Command Line to run (including cmd.exe /c if needed)</TD>
+  <TD><INPUT id=commandline name=commandline size=80></TD>
+</TR>
 <TR>
-<TD>Secure 'action override password'</TD>
-<TD><INPUT id='action override password' type=password name='action override password' required="true" secure="true">
-</TD>
+  <TD>Secure 'action override password'</TD>
+  <TD><INPUT id='action override password' type=password name='action override password' required="true" secure="true"></TD>
 </TR>
 </TBODY>
 </TABLE>
