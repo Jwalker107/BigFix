@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Task>
+		<Title>Rename Domain Computer</Title>
+		<Description><![CDATA[<P><LABEL for=secret><STRONG><FONT size=3>This Task will rename a domain-joined computer.</FONT></STRONG></LABEL></P>
+<BLOCKQUOTE style="MARGIN-RIGHT: 0px" dir=ltr>
+<P>
+<TABLE>
+<TBODY>
+<TR>
+<TD><LABEL for=account>Domain Credential to rename the computer on the domain DOMAIN\username:</LABEL> </TD>
+<TD><INPUT id=account name=account></TD></TR>
+<TR>
+<TD><LABEL for=password>Account Password:</LABEL> </TD>
+<TD><INPUT id=password type=password name=password> </TD></TR></TBODY></TABLE><script>
+document.body.ontakeaction = function() {
+ var params = [ 
+	document.getElementById( "account" ).value,
+	document.getElementById( "password" ).value
+	];
+var valid=true;
+for (i=0, len = params.length; i < len; i++) {
+	if (params[i] == null || params[i]=="") 
+	{
+	 valid=false;
+	}																	
+	;
+}
+	
+if (valid==false)
+	{alert("Hey, you forgot to enter a secure parameter! Please fill out the Description tab before taking the action.");}																	
+     else
+	{
+		
+				
+		TakeSecureFixletAction( Relevance('id of current fixlet'), Relevance('id of current bes site'), "Action1", {}, { 
+		account: document.getElementById( "account" ).value, password: document.getElementById( "password" ).value } );
+	}
+  return false;
+}
+</script> </P></BLOCKQUOTE>
+<P dir=ltr><STRONG><FONT color=#ff0000 size=3>Important Notes</FONT></STRONG></P>
+<UL dir=ltr>
+<LI>
+<DIV>This action uses Secure Parameters, which means it cannot be dynamically-targeted.</DIV>
+<LI>
+<DIV>This action requires Powershell 3 on the targeted endpoint.</DIV>
+<LI>
+<DIV>A restart is required for the new computer name to take effect.</DIV></LI></UL>]]></Description>
+		<Relevance>windows of operating system</Relevance>
+		<Relevance>if exists property "in proxy agent context" then not in proxy agent context else true</Relevance>
+		<Relevance><![CDATA[version of client >= "9.0"]]></Relevance>
+		<Category>BES Troubleshooting</Category>
+		<DownloadSize>0</DownloadSize>
+		<Source>HCL BigFix Professional Services / J Walker</Source>
+		<SourceID></SourceID>
+		<SourceReleaseDate>2020-02-24</SourceReleaseDate>
+		<SourceSeverity></SourceSeverity>
+		<CVENames></CVENames>
+		<SANSID></SANSID>
+		<MIMEField>
+			<Name>x-bfsync-source-actionsite</Name>
+			<Value>http://BES-Dev-Root:52311/cgi-bin/bfgather.exe/actionsite</Value>
+		</MIMEField>
+		<MIMEField>
+			<Name>x-bfsync-source-modification-time</Name>
+			<Value>Tue, 15 Nov 2022 16:17:07 +0000</Value>
+		</MIMEField>
+		<MIMEField>
+			<Name>x-bfsync-source-id</Name>
+			<Value>249</Value>
+		</MIMEField>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Thu, 02 Feb 2023 14:58:19 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<DefaultAction ID="Action1">
+			<Description>
+				<PreLink></PreLink>
+				<Link>Rename Computer</Link>
+				<PostLink><![CDATA[&nbsp; on the computers listed in the Description tab]]></PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell">
+//{parameter "account" of action}","{parameter "password" of action}
+action parameter query "NewComputerName" with description "Enter new computer name"
+continue if {parameter "NewComputerName" of action as trimmed string != ""}
+action uses wow64 redirection false
+
+delete __createfile
+createfile until EOF_EOF_EOF
+$User = "{parameter "account" of action}"
+$PWord = ConvertTo-SecureString -String "{parameter "password" of action}" -AsPlainText -Force
+$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $User, $PWord
+
+Rename-Computer -NewName "{parameter "NewComputerName" of action}" -DomainCredential $Credential
+EOF_EOF_EOF
+
+delete rename-computer.ps1
+move __createfile rename-computer.ps1
+waithidden powershell.exe -NonInteractive -ExecutionPolicy Bypass -File rename-computer.ps1
+delete rename-computer.ps1
+continue if {exit code of action = 0}
+action requires restart
+
+</ActionScript>
+			<SuccessCriteria Option="RunToCompletion"></SuccessCriteria>
+		</DefaultAction>
+	</Task>
+</BES>

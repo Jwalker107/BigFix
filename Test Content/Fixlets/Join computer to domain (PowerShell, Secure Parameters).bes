@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Task>
+		<Title>Join computer to domain (PowerShell, Secure Parameters)</Title>
+		<Description><![CDATA[<!-- Generic Parameterized Fixlet --><!-- The validation logic uses two custom optional attributes on input fields --><!-- required="true" indicates the value must be supplied --><!-- secure="true" indicates the value should be sent as a Secure Parameter -->
+<P style="MARGIN-RIGHT: 0px" dir=ltr><LABEL for=parameters><STRONG><FONT color=#008000 size=3>Customization Options</FONT></STRONG></LABEL></P>
+<TABLE>
+<TBODY>
+<TR>
+<TH></TH>
+<TR>
+<TD>Domain name to join:</TD>
+<TD><INPUT id=domain name=domain required="true"></TD></TR>
+<TR>
+<TD>OU to join (optional)</TD>
+<TD><INPUT id=OU name=OU></TD></TR>
+<TR>
+<TD>Domain username for join:</TD>
+<TD><INPUT id=username name=username required="true"></TD></TR>
+<TR>
+<TD>Domain password for join:</TD>
+<TD><INPUT id=password type=password name=password required="true" secure="true"></TD></TR></TBODY></TABLE><!-- for testing in browser outside of console --><!-- <button id="submit" onclick=takeAction()>Click Me</button> --><script>
+ 
+ document.body.ontakeaction = function() { return takeAction(); }
+ 
+ function takeAction() {
+ 	var block_action=false; parameters={}; secureparameters={};
+	var secure=false; input_list=document.body.getElementsByTagName("input");
+	for (i=0; i < input_list.length; i++) {
+        if (toBool(input_list[i].getAttribute("required")) && trim(input_list[i].value)=="") {
+            alert(input_list[i].name + " is required"); block_action=true; 
+			return false; } 
+		
+        // if *any* Secure Parameter is defined, we must send using TakeSecureFixletAction
+		if ( toBool(input_list[i].getAttribute("secure"))  || input_list[i].getAttribute("type")=="password" ) { secureparameters[input_list[i].name]=input_list[i].value; secure=true;
+			} else { parameters[input_list[i].name]=input_list[i].value;
+			}
+		
+	}
+	if (toBool(secure)) {
+		TakeSecureFixletAction( Relevance('id of current fixlet'), Relevance('id of current bes site'), "Action1", parameters, secureparameters );
+		} else {
+		TakeFixletAction( Relevance('id of current fixlet'), Relevance('id of current bes site'), "Action1", parameters );
+		}
+	return false;
+}
+
+function trim (str) {
+    return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+}
+
+function toBool(value) {
+  if ( !value ) { return false; }
+
+  switch(value.toString().toLowerCase()) { 
+    case "true": 
+    case "1": 
+    case "on": 
+    case "yes": 
+      return true; 
+    default: 
+      return false; 
+  } 
+}
+
+</script> ]]></Description>
+		<Relevance>if exists property "in proxy agent context" then not in proxy agent context else true</Relevance>
+		<Relevance><![CDATA[version of client >= "9.0"]]></Relevance>
+		<Relevance>windows of operating system</Relevance>
+		<Category>Example</Category>
+		<DownloadSize>0</DownloadSize>
+		<Source>Internal</Source>
+		<SourceID>Jason Walker</SourceID>
+		<SourceReleaseDate>2022-07-07</SourceReleaseDate>
+		<SourceSeverity></SourceSeverity>
+		<CVENames></CVENames>
+		<SANSID></SANSID>
+		<MIMEField>
+			<Name>x-bfsync-source-actionsite</Name>
+			<Value>http://BES-Dev-Root:52311/cgi-bin/bfgather.exe/actionsite</Value>
+		</MIMEField>
+		<MIMEField>
+			<Name>x-bfsync-source-modification-time</Name>
+			<Value>Tue, 15 Nov 2022 16:21:49 +0000</Value>
+		</MIMEField>
+		<MIMEField>
+			<Name>x-bfsync-source-id</Name>
+			<Value>9337</Value>
+		</MIMEField>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Thu, 02 Feb 2023 14:58:30 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<Action ID="Action1">
+			<Description>
+				<PreLink></PreLink>
+				<Link>Take Action </Link>
+				<PostLink></PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell"><![CDATA[
+action uses wow64 redirection {not x64 of operating system}
+
+delete __createfile
+
+//    CREATEFILE
+createfile until END_OF_FILE
+
+$domain = "{parameter "domain"}"
+$OU = "{parameter "OU"}"
+$password = '{parameter "password"}' | ConvertTo-SecureString -asPlainText -Force
+$username = '{parameter "username"}'
+$credential = New-Object System.Management.Automation.PSCredential($username,$password)
+try {{
+Add-Computer -DomainName $domain -Credential $credential {if parameter "OU" as trimmed string != "" then "-OUPath $OU" else ""} -Options AccountCreate -ErrorAction Stop
+}
+catch {{
+write-host $_.Exception.Message
+exit 1
+}
+
+END_OF_FILE
+
+delete powershell.ps1
+move __createfile powershell.ps1
+
+waithidden cmd.exe /c ""{ pathname of file ((it as string) of value "Path" of key "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" of native registry) }" -ExecutionPolicy Bypass -File powershell.ps1 > domain-join.txt 2>&1"
+delete powershell.ps1
+continue if {exit code of action = 0}
+
+action requires restart "join_domain"
+						]]></ActionScript>
+			<SuccessCriteria Option="RunToCompletion"></SuccessCriteria>
+		</Action>
+	</Task>
+</BES>
