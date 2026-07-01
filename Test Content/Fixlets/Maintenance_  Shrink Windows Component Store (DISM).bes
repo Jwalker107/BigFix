@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Task>
+		<Title>Maintenance:  Shrink Windows Component Store (DISM)</Title>
+		<Description><![CDATA[
+	<DIV>Attempt Windows Component Store Cleanup</DIV>
+	<P>This Task uses DISM to attempt shrinking&nbsp;the Windows Component Store.</P>
+	<P><STRONG>WARNING:</STRONG> Running this task will prevent rolling-back Windows Updates or Service Pack installations.&nbsp; It should only be run on healthy systems on which there will be no need to roll-back a patch!</P>
+	<P>Ref: <A href="https://docs.microsoft.com/en-us/troubleshoot/windows-server/deployment/fix-windows-update-errors">https://docs.microsoft.com/en-us/troubleshoot/windows-server/deployment/fix-windows-update-errors</A></P>
+]]></Description>
+		<Relevance>windows of operating system AND (if exists property "in proxy agent context" then not in proxy agent context else true)</Relevance>
+		<Relevance><![CDATA[version of operating system >= version "6.2"]]></Relevance>
+		<Category></Category>
+		<Source></Source>
+		<SourceID></SourceID>
+		<SourceReleaseDate>2019-06-04</SourceReleaseDate>
+		<SourceSeverity></SourceSeverity>
+		<CVENames></CVENames>
+		<SANSID></SANSID>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Thu, 02 Feb 2023 14:58:19 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<DefaultAction ID="Action1">
+			<Description>
+				<PreLink>Click </PreLink>
+				<Link>here</Link>
+				<PostLink> to attempt repair using Windows Update sources</PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell"><![CDATA[parameter "outfolder"="{(if (version of client >= "9" as version) then (pathname of parent folder of data folder of client) else (pathname of parent folder of regapp "besclient.exe"))}\BPS"
+
+action uses wow64 redirection false
+
+folder create "{parameter "outfolder"}"
+delete "{parameter "outfolder"}\DISM-spsuperseded.log"
+delete "{parameter "outfolder"}\DISM-ComponentCleanup.log"
+
+
+waithidden cmd /C "DISM.EXE /LogPath:"{parameter "outfolder"}\DISM-spsuperseded.log" /LogLevel:4  /NoRestart /Online /Cleanup-Image /spsuperseded /hidesp > "{parameter "outfolder"}\DISM-spsuperseded.out" 2>&1 "
+waithidden cmd /C "DISM.EXE /LogPath:"{parameter "outfolder"}\DISM-ComponentCleanup.log" /LogLevel:4 /Quiet /NoRestart /Online /Cleanup-Image /StartComponentCleanup /ResetBase > "{parameter "outfolder"}\DISM-ComponentCleanup.out" 2>&1"]]></ActionScript>
+		</DefaultAction>
+	</Task>
+</BES>
