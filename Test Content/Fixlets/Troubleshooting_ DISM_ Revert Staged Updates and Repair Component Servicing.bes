@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Task>
+		<Title>Troubleshooting: DISM: Revert Staged Updates and Repair Component Servicing</Title>
+		<Description><![CDATA[<P>Remove any Pending component installations, then perform a DISM RestoreHealth command.</P>
+<P>Logs generated:</P>
+<UL>
+<LI>\Windows\Temp\DISM-RemovePending.log 
+<LI>\Windows\Temp\DISM-RestoreHealth.out 
+<LI>\Windows\Temp\DISM-RestoreHealth.log</LI></UL>]]></Description>
+		<Relevance>windows of operating system AND (if exists property "in proxy agent context" then not in proxy agent context else true)</Relevance>
+		<Category></Category>
+		<Source></Source>
+		<SourceID></SourceID>
+		<SourceReleaseDate>2021-06-17</SourceReleaseDate>
+		<SourceSeverity></SourceSeverity>
+		<CVENames></CVENames>
+		<SANSID></SANSID>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Wed, 01 Jul 2026 14:49:07 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<DefaultAction ID="Action1">
+			<Description>
+				<PreLink>Click </PreLink>
+				<Link>here</Link>
+				<PostLink> to deploy this action.</PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell"><![CDATA[action uses wow64 redirection false
+delete __createfile
+createfile until EOF_EOF_EOF
+@echo DISM repair running %DATE% %TIME%
+
+@echo Kill any running WUSA update
+taskkill.exe /im wusa.exe /f
+
+@echo Package list before servicing:
+dism /online /get-packages /format:table
+
+@echo Removing any Pending Package installations via DISM
+for /f %%i in ('dism /online /get-packages /format:table ^|findstr " Pending ^|"') do dism.exe /online /remove-package /PackageName:%%i /NoRestart
+@echo DISM command ended with result code %ERRORLEVEL%
+
+@echo Package list after servicing:
+dism /online /get-packages /format:table
+
+
+
+@echo DISM repair completed %DATE% %TIME%
+
+
+EOF_EOF_EOF
+
+delete DISM-repair.cmd
+move __createfile DISM-repair.cmd
+folder create "{pathname of windows folder}\Temp"
+
+delete "{pathname of windows folder}\Temp\DISM-RemovePending.log"
+waithidden cmd.exe /c "DISM-repair.cmd >> "{pathname of windows folder}\Temp\DISM-RemovePending.log" 2>&1"
+
+
+
+delete "{pathname of windows folder}\Temp\DISM-RestoreHealth.log"
+delete "{pathname of windows folder}\Temp\DISM-RestoreHealth.out"
+waithidden cmd /C "DISM.EXE /LogPath:"{pathname of windows folder}\Temp\DISM-RestoreHealth.log" /LogLevel:4 /NoRestart /Online /Cleanup-Image /RestoreHealth > "{pathname of windows folder}\Temp\DISM-RestoreHealth.out" 2>&1"
+
+action requires restart "DISM-Repair"
+]]></ActionScript>
+		</DefaultAction>
+	</Task>
+</BES>

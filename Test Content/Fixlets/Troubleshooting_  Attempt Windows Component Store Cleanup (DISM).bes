@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Task>
+		<Title>Troubleshooting:  Attempt Windows Component Store Cleanup (DISM)</Title>
+		<Description><![CDATA[
+
+<DIV>Attempt Windows Component Store Cleanup</DIV>
+<P>This Task uses DISM to attempt cleaning up the Windows Component Store.</P>
+<P>The basic command run is</P>
+<BLOCKQUOTE style="MARGIN-RIGHT: 0px" dir=ltr>
+<P>DISM.EXE /Online /Cleanup-Image /RestoreHealth /Quiet /NoReboot</P></BLOCKQUOTE>
+<P>(along with logging options).&nbsp; Results are logged to BES Client\BPS\dism-restorehealth.log</P>
+<P>Optionally, the second action can use an offline copy of Windows to perform the repair.&nbsp; You will be prompted for the path of the Windows files to be used for the repair.&nbsp; This path must be accessible to the LocalSystem account, so it should be copied from a trusted source to the target system first.</P>
+<P>These repair options should only be performed as a troubleshooting measure when the system is failing to install Windows Updates.&nbsp; The DISM repair option is available on Windows 8 and higher.</P>
+<P>This Task, is provided by HCL BigFix Professional Services</P></DIV>
+Ref: <A href="https://docs.microsoft.com/en-us/troubleshoot/windows-server/deployment/fix-windows-update-errors">https://docs.microsoft.com/en-us/troubleshoot/windows-server/deployment/fix-windows-update-errors</A>
+
+]]></Description>
+		<Relevance>windows of operating system AND (if exists property "in proxy agent context" then not in proxy agent context else true)</Relevance>
+		<Relevance><![CDATA[version of operating system >= version "6.2"]]></Relevance>
+		<Category></Category>
+		<Source></Source>
+		<SourceID></SourceID>
+		<SourceReleaseDate>2019-06-04</SourceReleaseDate>
+		<SourceSeverity></SourceSeverity>
+		<CVENames></CVENames>
+		<SANSID></SANSID>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Thu, 02 Feb 2023 14:58:19 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<DefaultAction ID="Action1">
+			<Description>
+				<PreLink>Click </PreLink>
+				<Link>here</Link>
+				<PostLink> to attempt repair using Windows Update sources</PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell"><![CDATA[parameter "outfolder"="{(if (version of client >= "9" as version) then (pathname of parent folder of data folder of client) else (pathname of parent folder of regapp "besclient.exe"))}\BPS"
+
+action uses wow64 redirection false
+
+folder create "{parameter "outfolder"}"
+delete "{parameter "outfolder"}\DISM-RestoreHealth.log"
+
+
+waithidden cmd /C "DISM.EXE /LogPath:"{parameter "outfolder"}\DISM-RestoreHealth.log" /LogLevel:4 /NoRestart /Online /Cleanup-Image /RestoreHealth > "{parameter "outfolder"}\DISM-RestoreHealth.out" 2>&1"]]></ActionScript>
+		</DefaultAction>
+		<Action ID="Action2">
+			<Description>
+				<PreLink>Click </PreLink>
+				<Link>here</Link>
+				<PostLink> to attempt repair using offline Windows media.</PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell"><![CDATA[parameter "outfolder"="{(if (version of client >= "9" as version) then (pathname of parent folder of data folder of client) else (pathname of parent folder of regapp "besclient.exe"))}\BPS"
+action parameter query "RepairSource" with description "Enter the path of trusted Windows files to be used for repair" and with default value "C:\Windows-Media-Source"
+action uses wow64 redirection false
+
+folder create "{parameter "outfolder"}"
+delete "{parameter "outfolder"}\DISM-RestoreHealth.log"
+
+
+waithidden cmd /C "DISM.EXE /LogPath:"{parameter "outfolder"}\DISM-RestoreHealth.log" /LogLevel:4 /NoRestart /Online /Cleanup-Image /RestoreHealth /Source:"{parameter "RepairSource" of action}" /LimitAccess > "{parameter "outfolder"}\DISM-RestoreHealth.out" 2>&1"]]></ActionScript>
+		</Action>
+	</Task>
+</BES>
