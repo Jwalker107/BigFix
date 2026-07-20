@@ -14,6 +14,19 @@
       "relevanceCount": 1
     },
     {
+      "path": "Test Content/Apache commons-text/Apache Commons Text Scan Analysis.bes",
+      "name": "Apache Commons Text Scan Analysis.bes",
+      "dir": "Test Content/Apache commons-text",
+      "type": "Analysis",
+      "title": "Apache Commons Text Scan Analysis",
+      "source": "Internal",
+      "sourceReleaseDate": "2022-03-31",
+      "severity": "",
+      "domain": "BESC",
+      "downloadSize": "",
+      "relevanceCount": 2
+    },
+    {
       "path": "Test Content/Apache commons-text/Apache Commons Text detection scan (Linux).bes",
       "name": "Apache Commons Text detection scan (Linux).bes",
       "dir": "Test Content/Apache commons-text",
@@ -38,19 +51,6 @@
       "domain": "BESC",
       "downloadSize": "",
       "relevanceCount": 1
-    },
-    {
-      "path": "Test Content/Apache commons-text/Apache Commons Text Scan Analysis.bes",
-      "name": "Apache Commons Text Scan Analysis.bes",
-      "dir": "Test Content/Apache commons-text",
-      "type": "Analysis",
-      "title": "Apache Commons Text Scan Analysis",
-      "source": "Internal",
-      "sourceReleaseDate": "2022-03-31",
-      "severity": "",
-      "domain": "BESC",
-      "downloadSize": "",
-      "relevanceCount": 2
     },
     {
       "path": "Test Content/Fixlets/Collect Action Info.bes",
