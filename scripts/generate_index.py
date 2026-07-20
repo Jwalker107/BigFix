@@ -13,9 +13,11 @@ Run from the repo root:
     python scripts/generate_index.py
 """
 import json
+import os
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from urllib.parse import quote
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_PATH = REPO_ROOT / "docs" / "index.json"
@@ -24,6 +26,30 @@ OUTPUT_PATH = REPO_ROOT / "docs" / "index.json"
 EXCLUDED_DIR_PARTS = {".git", "docs", "schema"}
 
 KNOWN_ROOT_TAGS = {"Task", "Fixlet", "Analysis", "Baseline", "TaskCondition", "ComputerGroup"}
+
+# Same fallback repo/branch docs/app.js uses when it can't detect a fork from the page URL.
+DEFAULT_OWNER = "jwalker107"
+DEFAULT_REPO = "BigFix"
+DEFAULT_BRANCH = "master"
+
+
+def resolve_raw_base():
+    """Build the raw.githubusercontent.com base URL for this run.
+
+    GITHUB_REPOSITORY / GITHUB_REF_NAME are set automatically inside GitHub
+    Actions, so a fork's own workflow run produces download links pointing at
+    the fork - not this upstream repo. Falls back to the same defaults
+    docs/app.js uses when run locally, outside of Actions.
+    """
+    owner_repo = os.environ.get("GITHUB_REPOSITORY", "")
+    owner, _, repo = owner_repo.partition("/")
+    if not owner or not repo:
+        owner, repo = DEFAULT_OWNER, DEFAULT_REPO
+    branch = os.environ.get("GITHUB_REF_NAME") or DEFAULT_BRANCH
+    return f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/"
+
+
+RAW_BASE = resolve_raw_base()
 
 
 def find_bes_files():
@@ -56,6 +82,7 @@ def describe(rel_path: Path):
         "domain": "",
         "downloadSize": "",
         "relevanceCount": 0,
+        "downloadUrl": RAW_BASE + "/".join(quote(part) for part in rel_path.parts),
     }
 
     try:

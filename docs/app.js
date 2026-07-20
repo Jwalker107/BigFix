@@ -236,6 +236,17 @@ function renderDocument(doc, path) {
   const ghLink = document.createElement("span");
   ghLink.innerHTML = `<a href="${BLOB_BASE + path.split("/").map(encodeURIComponent).join("/")}" target="_blank" rel="noopener">View on GitHub</a>`;
   metaLine.appendChild(ghLink);
+
+  const indexEntry = allFiles.find((f) => f.path === path);
+  if (indexEntry && indexEntry.downloadUrl) {
+    const dlSpan = document.createElement("span");
+    const dlLink = document.createElement("a");
+    dlLink.href = indexEntry.downloadUrl;
+    dlLink.textContent = "Download";
+    dlLink.setAttribute("download", indexEntry.name);
+    dlSpan.appendChild(dlLink);
+    metaLine.appendChild(dlSpan);
+  }
   mainEl.appendChild(metaLine);
 
   // Description --------------------------------------------------------
