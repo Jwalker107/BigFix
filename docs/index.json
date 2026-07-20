@@ -11,7 +11,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 1
+      "relevanceCount": 1,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Analyses/Client%20Relay%20Chain%20Analysis.bes"
     },
     {
       "path": "Test Content/Apache commons-text/Apache Commons Text Scan Analysis.bes",
@@ -24,7 +25,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Apache%20commons-text/Apache%20Commons%20Text%20Scan%20Analysis.bes"
     },
     {
       "path": "Test Content/Apache commons-text/Apache Commons Text detection scan (Linux).bes",
@@ -37,7 +39,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Apache%20commons-text/Apache%20Commons%20Text%20detection%20scan%20%28Linux%29.bes"
     },
     {
       "path": "Test Content/Apache commons-text/Apache Commons Text detection scan (Windows).bes",
@@ -50,7 +53,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 1
+      "relevanceCount": 1,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Apache%20commons-text/Apache%20Commons%20Text%20detection%20scan%20%28Windows%29.bes"
     },
     {
       "path": "Test Content/Fixlets/Collect Action Info.bes",
@@ -63,7 +67,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 1
+      "relevanceCount": 1,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Collect%20Action%20Info.bes"
     },
     {
       "path": "Test Content/Fixlets/Exclude BES Client Data Folder from Windows Defender On-Access Scanning.bes",
@@ -76,7 +81,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Exclude%20BES%20Client%20Data%20Folder%20from%20Windows%20Defender%20On-Access%20Scanning.bes"
     },
     {
       "path": "Test Content/Fixlets/Exclude BES Client Process from Defender On-Access Scanning.bes",
@@ -89,7 +95,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Exclude%20BES%20Client%20Process%20from%20Defender%20On-Access%20Scanning.bes"
     },
     {
       "path": "Test Content/Fixlets/Exclude BES Console Cache from Defender On-Access Scanning.bes",
@@ -102,7 +109,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 3
+      "relevanceCount": 3,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Exclude%20BES%20Console%20Cache%20from%20Defender%20On-Access%20Scanning.bes"
     },
     {
       "path": "Test Content/Fixlets/Exclude BES Server Folder from Windows Defender On-Access Scanning.bes",
@@ -115,7 +123,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 3
+      "relevanceCount": 3,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Exclude%20BES%20Server%20Folder%20from%20Windows%20Defender%20On-Access%20Scanning.bes"
     },
     {
       "path": "Test Content/Fixlets/Join computer to domain (PowerShell, Secure Parameters).bes",
@@ -128,7 +137,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "0",
-      "relevanceCount": 3
+      "relevanceCount": 3,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Join%20computer%20to%20domain%20%28PowerShell%2C%20Secure%20Parameters%29.bes"
     },
     {
       "path": "Test Content/Fixlets/Maintenance_  Shrink Windows Component Store (DISM).bes",
@@ -141,7 +151,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Maintenance_%20%20Shrink%20Windows%20Component%20Store%20%28DISM%29.bes"
     },
     {
       "path": "Test Content/Fixlets/Rename Domain Computer.bes",
@@ -154,7 +165,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "0",
-      "relevanceCount": 3
+      "relevanceCount": 3,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Rename%20Domain%20Computer.bes"
     },
     {
       "path": "Test Content/Fixlets/Sample User Interface, Run As User, with PowerShell WinForm.bes",
@@ -167,7 +179,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 1
+      "relevanceCount": 1,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Sample%20User%20Interface%2C%20Run%20As%20User%2C%20with%20PowerShell%20WinForm.bes"
     },
     {
       "path": "Test Content/Fixlets/SecureParameters - Run Command As Admin.bes",
@@ -180,7 +193,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "0",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/SecureParameters%20-%20Run%20Command%20As%20Admin.bes"
     },
     {
       "path": "Test Content/Fixlets/Template_ Balloon Message via PowerShell.bes",
@@ -193,7 +207,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Template_%20Balloon%20Message%20via%20PowerShell.bes"
     },
     {
       "path": "Test Content/Fixlets/Troubleshooting_  Attempt Windows Component Store Cleanup (DISM).bes",
@@ -206,7 +221,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Troubleshooting_%20%20Attempt%20Windows%20Component%20Store%20Cleanup%20%28DISM%29.bes"
     },
     {
       "path": "Test Content/Fixlets/Troubleshooting_ DISM_ Revert Staged Updates and Repair Component Servicing.bes",
@@ -219,7 +235,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 1
+      "relevanceCount": 1,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Troubleshooting_%20DISM_%20Revert%20Staged%20Updates%20and%20Repair%20Component%20Servicing.bes"
     },
     {
       "path": "Test Content/Fixlets/Troubleshooting_ Reset Windows Update, Pending Updates, and DISM Repair.bes",
@@ -232,7 +249,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Troubleshooting_%20Reset%20Windows%20Update%2C%20Pending%20Updates%2C%20and%20DISM%20Repair.bes"
     },
     {
       "path": "Test Content/Fixlets/Workaround_ Apply IIS workaround for CVE-2022-41040 (Microsoft Exchange).bes",
@@ -245,7 +263,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 4
+      "relevanceCount": 4,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/Fixlets/Workaround_%20Apply%20IIS%20workaround%20for%20CVE-2022-41040%20%28Microsoft%20Exchange%29.bes"
     },
     {
       "path": "Test Content/OpenSSL Scanning/OpenSSL 3.0.0 - 3.0.6 Detection - YARA Scan - Windows x32.bes",
@@ -258,7 +277,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/OpenSSL%20Scanning/OpenSSL%203.0.0%20-%203.0.6%20Detection%20-%20YARA%20Scan%20-%20Windows%20x32.bes"
     },
     {
       "path": "Test Content/OpenSSL Scanning/OpenSSL 3.0.0 - 3.0.6 Detection - YARA Scan - Windows x64.bes",
@@ -271,7 +291,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/OpenSSL%20Scanning/OpenSSL%203.0.0%20-%203.0.6%20Detection%20-%20YARA%20Scan%20-%20Windows%20x64.bes"
     },
     {
       "path": "Test Content/OpenSSL Scanning/OpenSSL Scan Results (3.0.0 - 3.0.6).bes",
@@ -284,7 +305,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/OpenSSL%20Scanning/OpenSSL%20Scan%20Results%20%283.0.0%20-%203.0.6%29.bes"
     },
     {
       "path": "Test Content/YARA Scans/YARA Scan - Windows - MOVEit Neo23x0 - Standalone Scan YARA 4.3.2.bes",
@@ -297,7 +319,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "27660931",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/YARA%20Scans/YARA%20Scan%20-%20Windows%20-%20MOVEit%20Neo23x0%20-%20Standalone%20Scan%20YARA%204.3.2.bes"
     },
     {
       "path": "Test Content/YARA Scans/YARA scan results.bes",
@@ -310,7 +333,8 @@
       "severity": "",
       "domain": "BESC",
       "downloadSize": "",
-      "relevanceCount": 2
+      "relevanceCount": 2,
+      "downloadUrl": "https://raw.githubusercontent.com/Jwalker107/BigFix/master/Test%20Content/YARA%20Scans/YARA%20scan%20results.bes"
     }
   ]
 }
