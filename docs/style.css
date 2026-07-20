@@ -313,18 +313,28 @@ section { margin-bottom: 26px; }
   color: var(--text);
   margin-bottom: 3px;
 }
-.relevance-item textarea {
+.relevance-item .relevance-code {
   width: 100%;
+  max-height: 220px;
+  margin: 0;
   border: none;
   background: transparent;
-  resize: none;
   font-family: "Cascadia Code", "Consolas", monospace;
   font-size: 12.5px;
   color: var(--text);
-  outline: none;
   line-height: 1.55;
   padding: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-y: auto;
 }
+.relevance-item .relevance-code code { background: transparent; padding: 0; }
+
+/* BigFix Relevance token colors (see docs/vendor/hljs-bigfix-relevance.js) */
+.hljs-comment { color: var(--muted); font-style: italic; }
+.hljs-keyword { color: var(--accent); font-weight: 600; }
+.hljs-string { color: #1a7f37; }
+.hljs-number { color: #b45309; }
 
 .tabs {
   display: flex;

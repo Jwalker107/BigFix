@@ -437,14 +437,26 @@ function relevanceItem(index, text, name) {
     nameEl.textContent = name;
     body.appendChild(nameEl);
   }
-  const textarea = document.createElement("textarea");
-  textarea.readOnly = true;
-  textarea.value = text;
-  textarea.rows = Math.min(8, Math.max(1, Math.ceil(text.length / 90)));
-  body.appendChild(textarea);
+  body.appendChild(highlightedRelevance(text));
   item.appendChild(idx);
   item.appendChild(body);
   return item;
+}
+
+// Every caller of relevanceItem() passes actual BigFix Relevance-language text
+// (the main Relevance list, Analysis properties, Baseline component relevance),
+// so highlighting lives here rather than duplicated at each call site.
+function highlightedRelevance(text) {
+  const pre = document.createElement("pre");
+  pre.className = "relevance-code";
+  const code = document.createElement("code");
+  if (window.hljs && hljs.getLanguage("bigfix-relevance")) {
+    code.innerHTML = hljs.highlight(text, { language: "bigfix-relevance" }).value;
+  } else {
+    code.textContent = text;
+  }
+  pre.appendChild(code);
+  return pre;
 }
 
 function sectionLabel(text, count) {
