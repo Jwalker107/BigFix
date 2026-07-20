@@ -128,6 +128,25 @@ function renderTree(files) {
   }
 }
 
+async function downloadAsFile(url, filename) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Could not fetch file (${res.status})`);
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objectUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(objectUrl);
+  } catch (err) {
+    // Fall back to a plain navigation - worst case the browser just displays the raw file.
+    window.open(url, "_blank", "noopener");
+  }
+}
+
 function typeDotClass(type) {
   switch (type) {
     case "Fixlet": return "fixlet";
@@ -244,6 +263,14 @@ function renderDocument(doc, path) {
     dlLink.href = indexEntry.downloadUrl;
     dlLink.textContent = "Download";
     dlLink.setAttribute("download", indexEntry.name);
+    // raw.githubusercontent.com is a different origin than this page, and browsers only
+    // honor the `download` attribute for same-origin/blob/data URLs - cross-origin links
+    // just navigate instead of saving. Fetch it and save via an in-page blob: URL instead
+    // (works because raw.githubusercontent.com sends Access-Control-Allow-Origin: *).
+    dlLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      downloadAsFile(indexEntry.downloadUrl, indexEntry.name);
+    });
     dlSpan.appendChild(dlLink);
     metaLine.appendChild(dlSpan);
   }
