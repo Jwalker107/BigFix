@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BigFix Content Viewer</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/vs2015.min.css">
+<link rel="stylesheet" href="docs/style.css">
+</head>
+<body>
+  <header>
+    <div class="brand"><div class="brand-badge">BF</div>&nbsp; BigFix Content Viewer</div>
+    <div class="header-actions">
+      <a class="repo-link" id="repo-link" href="#" target="_blank" rel="noopener">github.com/bigfix/content</a>
+    </div>
+  </header>
+
+  <div class="layout" id="layout">
+    <aside class="sidebar">
+      <div class="sidebar-topbar">
+        <input type="search" id="search-box" placeholder="Filter files by name...">
+        <button id="sidebar-hide-btn" class="sidebar-hide-btn" type="button" title="Hide file list">&#9664;</button>
+      </div>
+      <div class="status-line">
+        <span id="status-text">Loading file list&hellip;</span>
+        <span class="status-actions">
+          <button id="collapse-all-btn" type="button" title="Collapse all folders">Collapse</button>
+          <button id="refresh-btn" type="button" title="Reload file list from GitHub">Refresh</button>
+        </span>
+      </div>
+      <div id="tree-root"></div>
+    </aside>
+
+    <button id="sidebar-show-btn" class="sidebar-show-btn" type="button" title="Show file list" hidden>&#9654;</button>
+
+    <main class="main" id="main">
+      <div class="placeholder">
+        <h2>Select a file to preview</h2>
+        <p>Choose a .bes fixlet, task, or analysis from the list on the left. Its Title, Description, Relevance and Action/Property content will render here.</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+  <script src="docs/vendor/hljs-bigfix-relevance.js"></script>
+  <script src="docs/app.js"></script>
+</body>
+</html>

@@ -1,15 +1,15 @@
 name: Update content index
 
-# Keeps docs/index.json (the file listing consumed by the GitHub Pages
-# viewer at docs/) in sync with the .bes files in the repo.
-#
-# NOTE: this repo's default branch is "master", not "main" - adjust the
-# branch below if that ever changes.
+# Keeps docs/index.json (the file listing consumed by the GitHub Pages viewer,
+# published from the repo root - see index.html there) up to date with the .bes
+# files in content/. generate_index.py only reads content/, so that's the only
+# path that can actually change its output - scoping the trigger to it also
+# means a push that only updates docs/index.json can't retrigger this run.
 on:
   push:
-    branches: [master]
-    paths-ignore:
-      - "docs/index.json"
+    branches: [main]
+    paths:
+      - "Test Content/**"
   workflow_dispatch: {}
 
 permissions:

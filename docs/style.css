@@ -60,10 +60,17 @@ header .repo-link {
 }
 header .repo-link:hover { text-decoration: underline; }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
 .layout {
   display: flex;
-  align-items: flex-start;
-  min-height: calc(100vh - 55px);
+  align-items: stretch;
+  height: calc(100vh - 55px);
+  overflow: hidden;
 }
 
 /* ---------- Sidebar ---------- */
@@ -72,9 +79,15 @@ header .repo-link:hover { text-decoration: underline; }
   flex-shrink: 0;
   background: var(--card);
   border-right: 1px solid var(--border);
-  min-height: calc(100vh - 55px);
   padding: 14px;
   overflow-y: auto;
+}
+
+.sidebar-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .sidebar input[type="search"] {
@@ -83,10 +96,41 @@ header .repo-link:hover { text-decoration: underline; }
   border: 1px solid var(--border);
   border-radius: 7px;
   font-size: 13px;
-  margin-bottom: 10px;
   outline: none;
 }
 .sidebar input[type="search"]:focus { border-color: var(--accent); }
+
+.sidebar-hide-btn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 30px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 10px;
+}
+.sidebar-hide-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+.sidebar-show-btn {
+  display: none;
+  flex-shrink: 0;
+  width: 20px;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-right: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 10px;
+}
+.sidebar-show-btn:hover { color: var(--accent); background: var(--mono-bg); }
+
+.layout.sidebar-hidden .sidebar { display: none; }
+.layout.sidebar-hidden .sidebar-show-btn { display: flex; }
 
 .sidebar .status-line {
   font-size: 11.5px;
@@ -95,6 +139,11 @@ header .repo-link:hover { text-decoration: underline; }
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.sidebar .status-line .status-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
 }
 .sidebar .status-line button {
   border: none;
@@ -169,6 +218,7 @@ header .repo-link:hover { text-decoration: underline; }
   flex: 1;
   min-width: 0;
   padding: 28px 32px 60px;
+  overflow-y: auto;
 }
 
 .placeholder {
@@ -283,6 +333,64 @@ section { margin-bottom: 26px; }
 .description-box a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
 .description-box a:hover { border-bottom-color: var(--accent); }
 .description-box img { max-width: 100%; }
+.description-box input, .description-box textarea {
+  font: inherit;
+  vertical-align: middle;
+  margin: 2px 0;
+}
+
+.unsupported-element-note code {
+  display: inline-block;
+  background: var(--mono-bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 1px 6px;
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.embedded-code-block {
+  display: inline-block;
+  margin: 2px 4px 2px 0;
+  vertical-align: middle;
+}
+.embedded-code-toggle {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  background: #e6eefc;
+  border: 1px solid #c7d9f2;
+  border-radius: 5px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+.embedded-code-toggle:hover { background: #d9e6fb; }
+.embedded-code-toggle.expanded { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.embedded-code-panel {
+  margin: 6px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #111;
+  background: var(--code-bg);
+}
+.embedded-code-panel[hidden] { display: none; }
+
+.embedded-code {
+  margin: 0;
+  max-height: 320px;
+  overflow: auto;
+  padding: 12px 14px;
+}
+.embedded-code code {
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre;
+  color: var(--code-text);
+}
 
 .relevance-list, .property-list { display: flex; flex-direction: column; gap: 10px; }
 .relevance-item {
@@ -414,7 +522,7 @@ details.raw-xml pre {
 }
 
 @media (max-width: 800px) {
-  .layout { flex-direction: column; }
+  .layout { flex-direction: column; height: auto; overflow: visible; }
   .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 40vh; }
-  .main { padding: 20px; }
+  .main { padding: 20px; overflow-y: visible; }
 }

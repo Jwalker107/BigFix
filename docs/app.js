@@ -1,15 +1,17 @@
 "use strict";
 
 /* ---------------------------------------------------------------------
- * Config: figure out which repo/branch to read from.
- * Defaults to bigfix/content@master; auto-detects owner/repo when this
- * page is served as a normal GitHub Pages project site
- * (https://<owner>.github.io/<repo>/...), so a fork of this repo works
- * out of the box too.
+ * Config: figure out which repo/branch this content came from, purely to
+ * build the "View on GitHub" link - the only thing that still points back
+ * at the source repo. Everything else is served locally (see
+ * localContentUrl below). Auto-detects owner/repo when this page is served
+ * as a normal GitHub Pages project site (https://<owner>.github.io/<repo>/...),
+ * so a fork of this repo links back to itself instead of the upstream repo.
  * ------------------------------------------------------------------- */
-const DEFAULT_OWNER = "jwalker107";
+const DEFAULT_OWNER = "Jwalke107";
 const DEFAULT_REPO = "BigFix";
-const DEFAULT_BRANCH = "master";
+const DEFAULT_BRANCH = "master"; /* default 'main' for public github.com */
+const GITHUB_SITE="github.com";
 
 function detectRepoConfig() {
   const host = location.hostname; // e.g. bigfix.github.io
@@ -22,25 +24,49 @@ function detectRepoConfig() {
 }
 
 const REPO = detectRepoConfig();
-const RAW_BASE = `https://raw.githubusercontent.com/${REPO.owner}/${REPO.repo}/${REPO.branch}/`;
-const BLOB_BASE = `https://github.com/${REPO.owner}/${REPO.repo}/blob/${REPO.branch}/`;
-// Served alongside this page (same origin), so it always matches the current fork/branch's
-// deployment without needing owner/repo in the URL - and isn't subject to the GitHub REST
-// API's unauthenticated rate limit the way the old git/trees call was.
-const INDEX_URL = "index.json";
+const BLOB_BASE = `https://${GITHUB_SITE}/${REPO.owner}/${REPO.repo}/blob/${REPO.branch}/`;
+// docs/index.json is generated (scripts/generate_index.py) but never moved or duplicated -
+// this page now lives at the repo root (alongside content/), and index.json is fetched
+// from where it actually sits, in docs/. Also sidesteps the GitHub REST API's
+// unauthenticated rate limit the way the old git/trees call would have hit.
+const INDEX_URL = "docs/index.json";
 
 const repoLinkEl = document.getElementById("repo-link");
-repoLinkEl.href = `https://github.com/${REPO.owner}/${REPO.repo}`;
-repoLinkEl.textContent = `github.com/${REPO.owner}/${REPO.repo}`;
+repoLinkEl.href = `https://${GITHUB_SITE}/${REPO.owner}/${REPO.repo}`;
+repoLinkEl.textContent = `${GITHUB_SITE}/${REPO.owner}/${REPO.repo}`;
+
+/* ---------------------------------------------------------------------
+ * Local content fetch
+ * Every entry's `path` in index.json (e.g. "content/Analyses/Foo.bes") is
+ * both its location in the source repo (for the "View on GitHub" link
+ * above) and a path relative to this page - which, since GitHub Pages
+ * publishes the whole repo root, resolves directly to the real content/
+ * file. No copy of the .bes files is kept anywhere; the viewer just never
+ * calls back to GitHub to show or download one.
+ * ------------------------------------------------------------------- */
+function localContentUrl(path) {
+  return path.split("/").map(encodeURIComponent).join("/");
+}
 
 const treeRootEl = document.getElementById("tree-root");
 const statusTextEl = document.getElementById("status-text");
 const refreshBtn = document.getElementById("refresh-btn");
+const collapseAllBtn = document.getElementById("collapse-all-btn");
 const searchBoxEl = document.getElementById("search-box");
 const mainEl = document.getElementById("main");
+const layoutEl = document.getElementById("layout");
+const sidebarHideBtn = document.getElementById("sidebar-hide-btn");
+const sidebarShowBtn = document.getElementById("sidebar-show-btn");
 
 let allFiles = []; // [{path, name, dir}]
 let activePath = null;
+
+collapseAllBtn.addEventListener("click", () => {
+  treeRootEl.querySelectorAll(".tree-group").forEach((group) => group.classList.add("collapsed"));
+});
+
+sidebarHideBtn.addEventListener("click", () => layoutEl.classList.add("sidebar-hidden"));
+sidebarShowBtn.addEventListener("click", () => layoutEl.classList.remove("sidebar-hidden"));
 
 /* ---------------------------------------------------------------------
  * File list loading
@@ -95,9 +121,13 @@ function renderTree(files) {
     return;
   }
 
+  // Collapsed is the default resting state; while actively filtering, groups start
+  // expanded instead so the matches a search turns up aren't hidden behind a chevron.
+  const startCollapsed = !query;
+
   for (const [dir, dirFiles] of [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
     const group = document.createElement("div");
-    group.className = "tree-group";
+    group.className = startCollapsed ? "tree-group collapsed" : "tree-group";
 
     const label = document.createElement("div");
     label.className = "tree-group-label";
@@ -125,25 +155,6 @@ function renderTree(files) {
     }
     group.appendChild(list);
     treeRootEl.appendChild(group);
-  }
-}
-
-async function downloadAsFile(url, filename) {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`Could not fetch file (${res.status})`);
-    const blob = await res.blob();
-    const objectUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = objectUrl;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(objectUrl);
-  } catch (err) {
-    // Fall back to a plain navigation - worst case the browser just displays the raw file.
-    window.open(url, "_blank", "noopener");
   }
 }
 
@@ -186,7 +197,7 @@ window.addEventListener("popstate", () => {
 async function loadAndRenderFile(path) {
   mainEl.innerHTML = `<div class="spinner-line">Loading ${escapeText(path)}…</div>`;
   try {
-    const res = await fetch(RAW_BASE + path.split("/").map(encodeURIComponent).join("/"));
+    const res = await fetch(localContentUrl(path));
     if (!res.ok) throw new Error(`Could not fetch file (${res.status})`);
     const xmlText = await res.text();
     const doc = new DOMParser().parseFromString(xmlText, "application/xml");
@@ -257,20 +268,14 @@ function renderDocument(doc, path) {
   metaLine.appendChild(ghLink);
 
   const indexEntry = allFiles.find((f) => f.path === path);
-  if (indexEntry && indexEntry.downloadUrl) {
+  if (indexEntry) {
     const dlSpan = document.createElement("span");
     const dlLink = document.createElement("a");
-    dlLink.href = indexEntry.downloadUrl;
+    // Same origin as this page (content/ is served as-is from the repo root), so the
+    // browser honors `download` natively - no fetch-to-blob workaround needed.
+    dlLink.href = localContentUrl(path);
     dlLink.textContent = "Download";
     dlLink.setAttribute("download", indexEntry.name);
-    // raw.githubusercontent.com is a different origin than this page, and browsers only
-    // honor the `download` attribute for same-origin/blob/data URLs - cross-origin links
-    // just navigate instead of saving. Fetch it and save via an in-page blob: URL instead
-    // (works because raw.githubusercontent.com sends Access-Control-Allow-Origin: *).
-    dlLink.addEventListener("click", (e) => {
-      e.preventDefault();
-      downloadAsFile(indexEntry.downloadUrl, indexEntry.name);
-    });
     dlSpan.appendChild(dlLink);
     metaLine.appendChild(dlSpan);
   }
@@ -281,7 +286,7 @@ function renderDocument(doc, path) {
     mainEl.appendChild(sectionLabel("Description"));
     const card = document.createElement("div");
     card.className = "card description-box";
-    card.innerHTML = sanitizeHtml(description);
+    renderSanitizedHtml(card, description);
     mainEl.appendChild(card);
   }
 
@@ -511,19 +516,99 @@ function escapeText(s) {
  * Minimal allowlist HTML sanitizer for <Description> content.
  * Descriptions come from files in the repo (or any fork/PR of it), so
  * they are treated as untrusted input and never injected as raw innerHTML.
+ * <SCRIPT>/<STYLE> are never executed/applied - their source is pulled out
+ * and shown, on demand, in a collapsed, syntax-highlighted code block
+ * instead (see makeEmbeddedCodeBlock). <INPUT> types with no safe, inert
+ * rendering (file, image, submit/button/reset, hidden, ...) are replaced
+ * with a highlighted snippet of the original tag instead of being dropped
+ * silently (see describeUnsupportedElement).
  * ------------------------------------------------------------------- */
 
 const ALLOWED_TAGS = new Set([
   "P", "A", "STRONG", "B", "EM", "I", "U", "BR", "UL", "OL", "LI", "SPAN",
   "H1", "H2", "H3", "H4", "H5", "H6", "BLOCKQUOTE", "CODE", "PRE",
-  "TABLE", "THEAD", "TBODY", "TR", "TD", "TH", "IMG",
+  "TABLE", "THEAD", "TBODY", "TR", "TD", "TH", "IMG", "INPUT", "TEXTAREA",
 ]);
 
-function sanitizeHtml(html) {
+// input types that are purely local/presentational - no navigation, no file
+// access, no implicit form action - so are safe to render as real controls.
+const SAFE_INPUT_TYPES = new Set([
+  "text", "password", "checkbox", "radio", "number", "date", "datetime-local",
+  "time", "email", "tel", "url", "range", "color", "search", "month", "week",
+]);
+
+// Attributes kept as-is for each allowed tag; everything else is stripped
+// below (this is what keeps event-handler attributes like onclick/onfocus -
+// a classic no-<script>-needed XSS vector - from ever surviving sanitizing).
+const TAG_ATTR_ALLOWLIST = {
+  A: new Set(["href"]),
+  IMG: new Set(["src", "alt", "width", "height"]),
+  INPUT: new Set(["type", "value", "placeholder", "checked", "disabled", "readonly", "maxlength", "min", "max", "step", "size"]),
+  TEXTAREA: new Set(["rows", "cols", "placeholder", "disabled", "readonly", "maxlength"]),
+};
+
+// Renders an unsupported element (e.g. <input type="file">) as an inert,
+// syntax-highlighted snippet of its original markup instead of the live
+// element, so the file's content is still visible without being rendered.
+function describeUnsupportedElement(node) {
+  const span = document.createElement("span");
+  span.className = "unsupported-element-note";
+  const code = document.createElement("code");
+  const snippet = node.outerHTML;
+  if (window.hljs && hljs.getLanguage("xml")) {
+    code.innerHTML = hljs.highlight(snippet, { language: "xml" }).value;
+  } else {
+    code.textContent = snippet;
+  }
+  span.appendChild(code);
+  return span;
+}
+
+// Builds a collapsed "SCRIPT"/"STYLE" toggle button that expands into a
+// read-only, syntax-highlighted code panel - used in place of rendering
+// embedded <script>/<style> content directly.
+function makeEmbeddedCodeBlock(tagName, code, lang) {
+  const wrap = document.createElement("div");
+  wrap.className = "embedded-code-block";
+
+  const toggleBtn = document.createElement("button");
+  toggleBtn.type = "button";
+  toggleBtn.className = "embedded-code-toggle";
+  toggleBtn.textContent = tagName;
+
+  const panel = document.createElement("div");
+  panel.className = "embedded-code-panel";
+  panel.hidden = true;
+
+  const pre = document.createElement("pre");
+  pre.className = "embedded-code";
+  const codeEl = document.createElement("code");
+  if (window.hljs && hljs.getLanguage(lang)) {
+    codeEl.innerHTML = hljs.highlight(code, { language: lang }).value;
+  } else {
+    codeEl.textContent = code;
+  }
+  pre.appendChild(codeEl);
+  panel.appendChild(pre);
+
+  toggleBtn.addEventListener("click", () => {
+    panel.hidden = !panel.hidden;
+    toggleBtn.classList.toggle("expanded", !panel.hidden);
+  });
+
+  wrap.appendChild(toggleBtn);
+  wrap.appendChild(panel);
+  return wrap;
+}
+
+// Sanitizes `html` and appends the result into `container` as real DOM nodes
+// (rather than returning a string) so the SCRIPT/STYLE toggle buttons keep
+// their event listeners - re-parsing a serialized string would lose them.
+function renderSanitizedHtml(container, html) {
   const template = document.createElement("template");
   template.innerHTML = html;
   sanitizeNode(template.content);
-  return template.innerHTML;
+  container.appendChild(template.content);
 }
 
 function sanitizeNode(parent) {
@@ -535,6 +620,17 @@ function sanitizeNode(parent) {
     }
     if (node.nodeType !== Node.ELEMENT_NODE) continue;
 
+    if (node.tagName === "SCRIPT" || node.tagName === "STYLE") {
+      const lang = node.tagName === "SCRIPT" ? "javascript" : "css";
+      node.parentNode.replaceChild(makeEmbeddedCodeBlock(node.tagName, node.textContent.trim(), lang), node);
+      continue;
+    }
+
+    if (node.tagName === "INPUT" && !SAFE_INPUT_TYPES.has((node.getAttribute("type") || "text").toLowerCase())) {
+      node.parentNode.replaceChild(describeUnsupportedElement(node), node);
+      continue;
+    }
+
     if (!ALLOWED_TAGS.has(node.tagName)) {
       // Unwrap: keep children (usually just text) but drop the disallowed tag itself.
       const parentNode = node.parentNode;
@@ -543,19 +639,26 @@ function sanitizeNode(parent) {
       continue;
     }
 
+    const allowedAttrs = TAG_ATTR_ALLOWLIST[node.tagName];
     for (const attr of [...node.attributes]) {
       const name = attr.name.toLowerCase();
       if (node.tagName === "A" && name === "href") {
         if (!/^(https?:|mailto:)/i.test(attr.value)) node.removeAttribute(attr.name);
-      } else if (node.tagName === "IMG" && (name === "src" || name === "alt" || name === "width" || name === "height")) {
-        if (name === "src" && !/^https?:/i.test(attr.value)) node.removeAttribute(attr.name);
-      } else {
+      } else if (node.tagName === "IMG" && name === "src") {
+        if (!/^https?:/i.test(attr.value)) node.removeAttribute(attr.name);
+      } else if (!allowedAttrs || !allowedAttrs.has(name)) {
         node.removeAttribute(attr.name);
       }
     }
     if (node.tagName === "A" && node.hasAttribute("href")) {
       node.setAttribute("target", "_blank");
       node.setAttribute("rel", "noopener noreferrer");
+    }
+    if (node.tagName === "INPUT") {
+      // Force off regardless of the original markup - untrusted rendered
+      // fields shouldn't get silently populated from the browser's saved
+      // autofill data (address, email, etc.).
+      node.setAttribute("autocomplete", "off");
     }
 
     sanitizeNode(node);
