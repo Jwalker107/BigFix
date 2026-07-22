@@ -7,7 +7,7 @@ name: Update content index
 # means a push that only updates docs/index.json can't retrigger this run.
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - "Test Content/**"
   workflow_dispatch: {}
