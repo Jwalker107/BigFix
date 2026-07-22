@@ -8,7 +8,7 @@
  * as a normal GitHub Pages project site (https://<owner>.github.io/<repo>/...),
  * so a fork of this repo links back to itself instead of the upstream repo.
  * ------------------------------------------------------------------- */
-const DEFAULT_OWNER = "Jwalke107";
+const DEFAULT_OWNER = "Jwalker107";
 const DEFAULT_REPO = "BigFix";
 const DEFAULT_BRANCH = "master"; /* default 'main' for public github.com */
 const GITHUB_SITE="github.com";

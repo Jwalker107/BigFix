@@ -17,7 +17,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SOURCE_ROOT = REPO_ROOT / "Test Content"
+#SOURCE_ROOT = REPO_ROOT / "Test Content"
+SOURCE_ROOT = REPO_ROOT
 OUTPUT_PATH = REPO_ROOT / "docs" / "index.json"
 
 KNOWN_ROOT_TAGS = {"Task", "Fixlet", "Analysis", "Baseline", "TaskCondition", "ComputerGroup"}
@@ -40,7 +41,8 @@ def describe(source_rel_path: Path):
     # This file's path within the repo (content/ lives at the repo root) - doubles as
     # docs/app.js's local fetch/download URL (relative to the published index.html, which
     # lives at the repo root too) and, combined with BLOB_BASE there, the "View on GitHub" link.
-    rel_path = Path("content") / source_rel_path
+    #rel_path = Path("content") / source_rel_path
+    rel_path = source_rel_path
     posix_path = rel_path.as_posix()
     entry = {
         "path": posix_path,

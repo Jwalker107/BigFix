@@ -1,9 +1,9 @@
 {
   "files": [
     {
-      "path": "content/Analyses/Client Relay Chain Analysis.bes",
+      "path": "Test Content/Analyses/Client Relay Chain Analysis.bes",
       "name": "Client Relay Chain Analysis.bes",
-      "dir": "content/Analyses",
+      "dir": "Test Content/Analyses",
       "type": "Analysis",
       "title": "Client Relay Chain Analysis",
       "source": "Internal",
@@ -14,22 +14,9 @@
       "relevanceCount": 1
     },
     {
-      "path": "content/Apache commons-text/Apache Commons Text Scan Analysis.bes",
-      "name": "Apache Commons Text Scan Analysis.bes",
-      "dir": "content/Apache commons-text",
-      "type": "Analysis",
-      "title": "Apache Commons Text Scan Analysis",
-      "source": "Internal",
-      "sourceReleaseDate": "2022-03-31",
-      "severity": "",
-      "domain": "BESC",
-      "downloadSize": "",
-      "relevanceCount": 2
-    },
-    {
-      "path": "content/Apache commons-text/Apache Commons Text detection scan (Linux).bes",
+      "path": "Test Content/Apache commons-text/Apache Commons Text detection scan (Linux).bes",
       "name": "Apache Commons Text detection scan (Linux).bes",
-      "dir": "content/Apache commons-text",
+      "dir": "Test Content/Apache commons-text",
       "type": "Task",
       "title": "Apache Commons Text detection scan (Linux)",
       "source": "Internal",
@@ -40,9 +27,9 @@
       "relevanceCount": 2
     },
     {
-      "path": "content/Apache commons-text/Apache Commons Text detection scan (Windows).bes",
+      "path": "Test Content/Apache commons-text/Apache Commons Text detection scan (Windows).bes",
       "name": "Apache Commons Text detection scan (Windows).bes",
-      "dir": "content/Apache commons-text",
+      "dir": "Test Content/Apache commons-text",
       "type": "Task",
       "title": "Apache Commons Text detection scan (Windows)",
       "source": "Internal",
@@ -53,9 +40,22 @@
       "relevanceCount": 1
     },
     {
-      "path": "content/Fixlets/Collect Action Info.bes",
+      "path": "Test Content/Apache commons-text/Apache Commons Text Scan Analysis.bes",
+      "name": "Apache Commons Text Scan Analysis.bes",
+      "dir": "Test Content/Apache commons-text",
+      "type": "Analysis",
+      "title": "Apache Commons Text Scan Analysis",
+      "source": "Internal",
+      "sourceReleaseDate": "2022-03-31",
+      "severity": "",
+      "domain": "BESC",
+      "downloadSize": "",
+      "relevanceCount": 2
+    },
+    {
+      "path": "Test Content/Fixlets/Collect Action Info.bes",
       "name": "Collect Action Info.bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Fixlet",
       "title": "Collect Action Info",
       "source": "Internal",
@@ -66,9 +66,9 @@
       "relevanceCount": 1
     },
     {
-      "path": "content/Fixlets/Exclude BES Client Data Folder from Windows Defender On-Access Scanning.bes",
+      "path": "Test Content/Fixlets/Exclude BES Client Data Folder from Windows Defender On-Access Scanning.bes",
       "name": "Exclude BES Client Data Folder from Windows Defender On-Access Scanning.bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Fixlet",
       "title": "Exclude BES Client Data Folder from Windows Defender On-Access Scanning",
       "source": "Internal",
@@ -79,9 +79,9 @@
       "relevanceCount": 2
     },
     {
-      "path": "content/Fixlets/Exclude BES Client Process from Defender On-Access Scanning.bes",
+      "path": "Test Content/Fixlets/Exclude BES Client Process from Defender On-Access Scanning.bes",
       "name": "Exclude BES Client Process from Defender On-Access Scanning.bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Fixlet",
       "title": "Exclude BES Client Process from Defender On-Access Scanning",
       "source": "Internal",
@@ -92,9 +92,9 @@
       "relevanceCount": 2
     },
     {
-      "path": "content/Fixlets/Exclude BES Console Cache from Defender On-Access Scanning.bes",
+      "path": "Test Content/Fixlets/Exclude BES Console Cache from Defender On-Access Scanning.bes",
       "name": "Exclude BES Console Cache from Defender On-Access Scanning.bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Fixlet",
       "title": "Exclude BES Console Cache from Defender On-Access Scanning",
       "source": "Internal",
@@ -105,9 +105,9 @@
       "relevanceCount": 3
     },
     {
-      "path": "content/Fixlets/Exclude BES Server Folder from Windows Defender On-Access Scanning.bes",
+      "path": "Test Content/Fixlets/Exclude BES Server Folder from Windows Defender On-Access Scanning.bes",
       "name": "Exclude BES Server Folder from Windows Defender On-Access Scanning.bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Fixlet",
       "title": "Exclude BES Server Folder from Windows Defender On-Access Scanning",
       "source": "Internal",
@@ -118,9 +118,9 @@
       "relevanceCount": 3
     },
     {
-      "path": "content/Fixlets/Join computer to domain (PowerShell, Secure Parameters).bes",
+      "path": "Test Content/Fixlets/Join computer to domain (PowerShell, Secure Parameters).bes",
       "name": "Join computer to domain (PowerShell, Secure Parameters).bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Task",
       "title": "Join computer to domain (PowerShell, Secure Parameters)",
       "source": "Internal",
@@ -131,9 +131,9 @@
       "relevanceCount": 3
     },
     {
-      "path": "content/Fixlets/Maintenance_  Shrink Windows Component Store (DISM).bes",
+      "path": "Test Content/Fixlets/Maintenance_  Shrink Windows Component Store (DISM).bes",
       "name": "Maintenance_  Shrink Windows Component Store (DISM).bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Task",
       "title": "Maintenance:  Shrink Windows Component Store (DISM)",
       "source": "",
@@ -144,9 +144,9 @@
       "relevanceCount": 2
     },
     {
-      "path": "content/Fixlets/Rename Domain Computer.bes",
+      "path": "Test Content/Fixlets/Rename Domain Computer.bes",
       "name": "Rename Domain Computer.bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Task",
       "title": "Rename Domain Computer",
       "source": "HCL BigFix Professional Services / J Walker",
@@ -157,9 +157,9 @@
       "relevanceCount": 3
     },
     {
-      "path": "content/Fixlets/Sample User Interface, Run As User, with PowerShell WinForm.bes",
+      "path": "Test Content/Fixlets/Sample User Interface, Run As User, with PowerShell WinForm.bes",
       "name": "Sample User Interface, Run As User, with PowerShell WinForm.bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Task",
       "title": "Sample User Interface, Run As User, with PowerShell WinForm",
       "source": "Internal",
@@ -170,9 +170,9 @@
       "relevanceCount": 1
     },
     {
-      "path": "content/Fixlets/SecureParameters - Run Command As Admin.bes",
+      "path": "Test Content/Fixlets/SecureParameters - Run Command As Admin.bes",
       "name": "SecureParameters - Run Command As Admin.bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Fixlet",
       "title": "Example Parameterized Fixlet with SecureParameters to Run As User with Admin Privilege",
       "source": "Internal",
@@ -183,9 +183,9 @@
       "relevanceCount": 2
     },
     {
-      "path": "content/Fixlets/Template_ Balloon Message via PowerShell.bes",
+      "path": "Test Content/Fixlets/Template_ Balloon Message via PowerShell.bes",
       "name": "Template_ Balloon Message via PowerShell.bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Task",
       "title": "Template: Balloon Message via PowerShell",
       "source": "Internal",
@@ -196,9 +196,9 @@
       "relevanceCount": 2
     },
     {
-      "path": "content/Fixlets/Troubleshooting_  Attempt Windows Component Store Cleanup (DISM).bes",
+      "path": "Test Content/Fixlets/Troubleshooting_  Attempt Windows Component Store Cleanup (DISM).bes",
       "name": "Troubleshooting_  Attempt Windows Component Store Cleanup (DISM).bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Task",
       "title": "Troubleshooting:  Attempt Windows Component Store Cleanup (DISM)",
       "source": "",
@@ -209,9 +209,9 @@
       "relevanceCount": 2
     },
     {
-      "path": "content/Fixlets/Troubleshooting_ DISM_ Revert Staged Updates and Repair Component Servicing.bes",
+      "path": "Test Content/Fixlets/Troubleshooting_ DISM_ Revert Staged Updates and Repair Component Servicing.bes",
       "name": "Troubleshooting_ DISM_ Revert Staged Updates and Repair Component Servicing.bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Task",
       "title": "Troubleshooting: DISM: Revert Staged Updates and Repair Component Servicing",
       "source": "",
@@ -222,9 +222,9 @@
       "relevanceCount": 1
     },
     {
-      "path": "content/Fixlets/Troubleshooting_ Reset Windows Update, Pending Updates, and DISM Repair.bes",
+      "path": "Test Content/Fixlets/Troubleshooting_ Reset Windows Update, Pending Updates, and DISM Repair.bes",
       "name": "Troubleshooting_ Reset Windows Update, Pending Updates, and DISM Repair.bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Task",
       "title": "Troubleshooting: Reset Windows Update, Pending Updates, and DISM Repair",
       "source": "Internal",
@@ -235,9 +235,9 @@
       "relevanceCount": 2
     },
     {
-      "path": "content/Fixlets/Workaround_ Apply IIS workaround for CVE-2022-41040 (Microsoft Exchange).bes",
+      "path": "Test Content/Fixlets/Workaround_ Apply IIS workaround for CVE-2022-41040 (Microsoft Exchange).bes",
       "name": "Workaround_ Apply IIS workaround for CVE-2022-41040 (Microsoft Exchange).bes",
-      "dir": "content/Fixlets",
+      "dir": "Test Content/Fixlets",
       "type": "Fixlet",
       "title": "Workaround: Apply IIS workaround for CVE-2022-41040 (Microsoft Exchange) v2",
       "source": "Internal",
@@ -248,9 +248,9 @@
       "relevanceCount": 4
     },
     {
-      "path": "content/OpenSSL Scanning/OpenSSL 3.0.0 - 3.0.6 Detection - YARA Scan - Windows x32.bes",
+      "path": "Test Content/OpenSSL Scanning/OpenSSL 3.0.0 - 3.0.6 Detection - YARA Scan - Windows x32.bes",
       "name": "OpenSSL 3.0.0 - 3.0.6 Detection - YARA Scan - Windows x32.bes",
-      "dir": "content/OpenSSL Scanning",
+      "dir": "Test Content/OpenSSL Scanning",
       "type": "Task",
       "title": "OpenSSL 3.0.0 - 3.0.6 Detection - YARA Scan - Windows x32",
       "source": "HCL BigFix Services",
@@ -261,9 +261,9 @@
       "relevanceCount": 2
     },
     {
-      "path": "content/OpenSSL Scanning/OpenSSL 3.0.0 - 3.0.6 Detection - YARA Scan - Windows x64.bes",
+      "path": "Test Content/OpenSSL Scanning/OpenSSL 3.0.0 - 3.0.6 Detection - YARA Scan - Windows x64.bes",
       "name": "OpenSSL 3.0.0 - 3.0.6 Detection - YARA Scan - Windows x64.bes",
-      "dir": "content/OpenSSL Scanning",
+      "dir": "Test Content/OpenSSL Scanning",
       "type": "Task",
       "title": "OpenSSL 3.0.0 - 3.0.6 Detection - YARA Scan - Windows x64",
       "source": "HCL BigFix Services",
@@ -274,9 +274,9 @@
       "relevanceCount": 2
     },
     {
-      "path": "content/OpenSSL Scanning/OpenSSL Scan Results (3.0.0 - 3.0.6).bes",
+      "path": "Test Content/OpenSSL Scanning/OpenSSL Scan Results (3.0.0 - 3.0.6).bes",
       "name": "OpenSSL Scan Results (3.0.0 - 3.0.6).bes",
-      "dir": "content/OpenSSL Scanning",
+      "dir": "Test Content/OpenSSL Scanning",
       "type": "Analysis",
       "title": "OpenSSL Scan Results (3.0.0 - 3.0.6)",
       "source": "Internal",
@@ -287,9 +287,9 @@
       "relevanceCount": 2
     },
     {
-      "path": "content/YARA Scans/YARA Scan - Windows - MOVEit Neo23x0 - Standalone Scan YARA 4.3.2.bes",
+      "path": "Test Content/YARA Scans/YARA Scan - Windows - MOVEit Neo23x0 - Standalone Scan YARA 4.3.2.bes",
       "name": "YARA Scan - Windows - MOVEit Neo23x0 - Standalone Scan YARA 4.3.2.bes",
-      "dir": "content/YARA Scans",
+      "dir": "Test Content/YARA Scans",
       "type": "Task",
       "title": "YARA Scan - Windows - MOVEit Neo23x0 - Standalone Scan YARA 4.3.2",
       "source": "BigFix Community Content",
@@ -300,9 +300,9 @@
       "relevanceCount": 2
     },
     {
-      "path": "content/YARA Scans/YARA scan results.bes",
+      "path": "Test Content/YARA Scans/YARA scan results.bes",
       "name": "YARA scan results.bes",
-      "dir": "content/YARA Scans",
+      "dir": "Test Content/YARA Scans",
       "type": "Analysis",
       "title": "YARA scan results",
       "source": "Internal",
