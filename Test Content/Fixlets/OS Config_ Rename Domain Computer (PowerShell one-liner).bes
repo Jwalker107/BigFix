@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Task>
+		<Title>OS Config: Rename Domain Computer (PowerShell one-liner)</Title>
+		<Description><![CDATA[<P><STRONG><FONT size=3>About this Task</FONT></STRONG></P>
+<BLOCKQUOTE style="MARGIN-RIGHT: 0px" dir=ltr>
+<P>This task renames the local computer and unjoins it from the Domain.</P>
+<P>This task is applicable on:&nbsp;Windows&nbsp;with version 9.0+ of the BESClient.</P>
+<P>This implementation passes PowerShell script via an 'echo' command.&nbsp; This eliminates needing to save the credentials to a file on-disk, with the cost of added complexity on character escaping.</P></BLOCKQUOTE>
+<P dir=ltr><LABEL for=secret><STRONG><FONT size=3>Action Description</FONT></STRONG></LABEL></P>
+<UL dir=ltr>
+<LI>
+<DIV style="MARGIN-RIGHT: 0px"><LABEL for=secret><STRONG>Action1: Rename the computer.</STRONG></LABEL></DIV></LI></UL>
+<BLOCKQUOTE style="MARGIN-RIGHT: 0px" dir=ltr>
+<P style="MARGIN-RIGHT: 0px"><LABEL for=secret>This action prompts for an existing&nbsp;local user account name and changes&nbsp;its password to the value specified in the "Password" field under "Customization Options".</LABEL></P>
+<P style="MARGIN-RIGHT: 0px"><LABEL for=secret></LABEL><LABEL for=secret><STRONG><FONT color=#008000 size=3>Customization Options</FONT></STRONG></LABEL></P></BLOCKQUOTE>
+<BLOCKQUOTE style="MARGIN-RIGHT: 0px" dir=ltr>
+<P>
+<TABLE>
+<TBODY>
+<TR>
+<TD><LABEL for=secret>Current Domain Name:</LABEL> </TD>
+<TD><INPUT id=domainname name=domainname></TD></TR>
+<TR>
+<TD><LABEL for=secret>Domain Account:</LABEL> </TD>
+<TD><INPUT id=userd name=userd></TD></TR>
+<TR>
+<TD><LABEL for=secret>Domain Account Password:</LABEL> </TD>
+<TD><INPUT id=passwordd type=password name=passwordd> </TD></TR>
+<TR>
+<TD><LABEL for=secret>New Computername:</LABEL> </TD>
+<TD><INPUT id=newname name=newname> </TD></TR></TBODY></TABLE><script>
+                                                   document.body.ontakeaction = function() {
+                                                                    var params = [ document.getElementById( "domainname" ).value,
+																		document.getElementById( "userd" ).value,
+																		document.getElementById( "passwordd" ).value,
+																		document.getElementById( "newname" ).value
+																		];
+																	var valid=true;
+																	for (i=0, len = params.length; i < len; i++) {
+																		if (params[i] == null || params[i]=="") 
+																		{
+																		 valid=false;
+																		}																	
+																																															;
+																	}
+																		
+																	if (valid==false)
+																		{alert("Hey, you forgot to enter a secure parameter! Please fill out the Description tab before taking the action.");}																	
+                                                                    else
+																		{TakeSecureFixletAction( Relevance('id of current fixlet'), Relevance('id of current bes site'), "Action1", {}, { 
+																			domainname: document.getElementById( "domainname" ).value, userd: document.getElementById( "userd" ).value, passwordd: document.getElementById( "passwordd" ).value, newname: document.getElementById( "newname" ).value	} );
+																		}
+                                                                    return false;
+                                                   }
+                                                   </script> </P></BLOCKQUOTE>
+<P dir=ltr><STRONG><FONT color=#ff0000 size=3>Important Notes</FONT></STRONG></P>
+<UL dir=ltr>
+<LI>
+<DIV>You must enter a Domain credential and password in order to take an action</DIV>
+<LI>Because of the way secure parameters work, you cannot use this task in&nbsp;a baseline, target an action dynamically by property (e.g., automatic groups), use add additional actions.</LI></UL>]]></Description>
+		<Relevance>windows of operating system</Relevance>
+		<Relevance>if exists property "in proxy agent context" then not in proxy agent context else true</Relevance>
+		<Relevance><![CDATA[version of client >= "9.0"]]></Relevance>
+		<Category>OS Configuration</Category>
+		<DownloadSize>0</DownloadSize>
+		<Source>Internal</Source>
+		<SourceID></SourceID>
+		<SourceReleaseDate>2026-09-02</SourceReleaseDate>
+		<SourceSeverity></SourceSeverity>
+		<CVENames></CVENames>
+		<SANSID></SANSID>
+		<MIMEField>
+			<Name>x-fixlet-modification-time</Name>
+			<Value>Wed, 02 Sep 2026 16:27:59 +0000</Value>
+		</MIMEField>
+		<Domain>BESC</Domain>
+		<DefaultAction ID="Action1">
+			<Description>
+				<PreLink></PreLink>
+				<Link>Rename</Link>
+				<PostLink><![CDATA[&nbsp;the computer]]></PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell"><![CDATA[action log all
+
+action uses wow64 redirection false
+
+waithidden cmd.exe /c "echo  Write-Output 'Rename-Computer' ; try {{ $password = ConvertTo-SecureString '{parameter "passwordd" of action}' -AsPlainText -Force ; $cred = New-Object System.Management.Automation.PSCredential ^('{parameter "domainname" of action}\{parameter "userd" of action}', $password^) ; Rename-Computer -NewName '{parameter "newname" of action}' -DomainCredential $cred -Restart -Force -ErrorAction Stop ; Write-Output 'Rename-Computer Succeeded' ; exit 0 } catch {{  [Console]::Error.WriteLine('Rename-Computer Failed: ' + $_.Exception.Message) ; exit 1 } | powershell.exe -NoProfile -Command -   > \RenameDomainComputer.out 2>&1
+continue if {exit code of action = 0 }
+action requires restart "RenameDomainComputer"]]></ActionScript>
+			<SuccessCriteria Option="RunToCompletion"></SuccessCriteria>
+		</DefaultAction>
+	</Task>
+</BES>
