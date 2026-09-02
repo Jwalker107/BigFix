@@ -144,6 +144,19 @@
       "relevanceCount": 2
     },
     {
+      "path": "Test Content/Fixlets/OS Config_ Rename Domain Computer (PowerShell one-liner).bes",
+      "name": "OS Config_ Rename Domain Computer (PowerShell one-liner).bes",
+      "dir": "Test Content/Fixlets",
+      "type": "Task",
+      "title": "OS Config: Rename Domain Computer (PowerShell one-liner)",
+      "source": "Internal",
+      "sourceReleaseDate": "2026-09-02",
+      "severity": "",
+      "domain": "BESC",
+      "downloadSize": "0",
+      "relevanceCount": 3
+    },
+    {
       "path": "Test Content/Fixlets/Rename Domain Computer.bes",
       "name": "Rename Domain Computer.bes",
       "dir": "Test Content/Fixlets",
